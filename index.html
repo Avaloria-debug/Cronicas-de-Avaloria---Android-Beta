@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<!-- skill:chrome -->
+<style>
+/* Credit line — bottom-right */
+.design-ui-credit {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  font: 11px/1 system-ui, sans-serif;
+  color: rgba(128,128,128,0.5);
+  pointer-events: none;
+  z-index: 2147483647;
+  transition: opacity 0.4s ease;
+  user-select: none;
+  letter-spacing: 0.02em;
+}
+
+/* Hide chrome on touch devices */
+@media (hover: none) {
+  .design-ui-credit { display: none; }
+}
+
+/* Print fixes */
+@media print {
+  * {
+    transition: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .design-ui-credit { display: none !important; }
+}
+
+</style>
+<script>
+(function () {
+    // Design-ui pages are single compositions, so the whole body is editable.
+    function markEditable() {
+        document.body.classList.add('artifact-editable');
+    }
+
+    // Credit badge with idle-fade. Hover devices only.
+    function initChromeUI() {
+        if (!matchMedia('(hover: hover)').matches) return;
+
+        var credit = document.createElement('div');
+        credit.className = 'design-ui-credit';
+        credit.setAttribute('aria-hidden', 'true');
+        credit.innerHTML = '\u{1F49C} by ClickUp Brain';
+        document.body.appendChild(credit);
+
+        var timer = null;
+        var fade = function (out) { credit.style.opacity = out ? '0' : ''; };
+        fade(true);
+        var show = function () {
+            fade(false);
+            clearTimeout(timer);
+            timer = setTimeout(function () { fade(true); }, 3000);
+        };
+        document.addEventListener('mousemove', show);
+        show();
+    }
+
+    function init() {
+        markEditable();
+        initChromeUI();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
+</script>
+<!-- /skill:chrome -->
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#0c0f0c" />
+<title>Crónicas de Avaloria</title>
+<style>
+:root{
+  --bg:oklch(0.112 0.012 145);
+  --bg-deep:oklch(0.09 0.01 145);
+  --surface:oklch(0.148 0.015 145);
+  --surface-2:oklch(0.18 0.018 145);
+  --surface-3:oklch(0.22 0.022 145);
+  --ink:oklch(0.78 0.03 92);
+  --ink-soft:oklch(0.63 0.022 92);
+  --ink-faint:oklch(0.47 0.015 100);
+  --line:oklch(0.26 0.02 120);
+  --line-strong:oklch(0.38 0.03 110);
+  --gold:oklch(0.71 0.11 78);
+  --gold-dim:oklch(0.57 0.08 78);
+  --moss:oklch(0.55 0.08 145);
+  --clay:oklch(0.53 0.07 52);
+  --warn:oklch(0.62 0.16 35);
+  --danger:oklch(0.56 0.18 28);
+  --ok:oklch(0.62 0.12 145);
+  --player:oklch(0.70 0.03 235);
+  --player-soft:oklch(0.52 0.02 235);
+  --shadow:0 18px 50px rgba(0,0,0,.32);
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-left:env(safe-area-inset-left,0px);
+  --safe-right:env(safe-area-inset-right,0px);
+  --font-ui:"Courier New", Courier, monospace;
+  --font-story: Georgia, "Times New Roman", serif;
+  --lh:24px;
+  --ease:cubic-bezier(0.16,1,0.3,1);
+  --android-width:412px;
+  --screen-pad:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);overscroll-behavior:none}
+body{
+  color:var(--ink);
+  font-family:var(--font-ui);
+  overflow:hidden;
+  touch-action:manipulation;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+button,input,textarea{font:inherit;color:inherit}
+button,label,input{user-select:none;-webkit-user-select:none}
+a{color:var(--gold)}
+button,input,textarea,.trait,.quick-btn,.pitem,.icon-btn,.btn{
+  touch-action:manipulation;
+}
+#app{
+  position:relative;
+  width:100%;
+  max-width:var(--android-width);
+  height:100vh;
+  height:100dvh;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  padding-left:var(--safe-left);
+  padding-right:var(--safe-right);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(120,100,46,.13), transparent 32%),
+    radial-gradient(circle at 50% 120%, rgba(65,96,62,.12), transparent 42%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+}
+#app::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+   linear-gradient(rgba(255,255,255,.015),rgba(255,255,255,0)),
+   repeating-linear-gradient(180deg, rgba(255,255,255,.015) 0 1px, transparent 1px 3px);
+  opacity:.18;
+  mix-blend-mode:soft-light;
+}
+.screen{display:none;position:relative;flex:1;min-height:0}
+.screen.active{display:flex}
+#splash,#apiscreen,#charscreen{
+  flex-direction:column;
+  justify-content:center;
+  padding:calc(var(--safe-top) + 28px) var(--screen-pad) calc(var(--safe-bottom) + 28px);
+  overflow:auto;
+}
+.orb{
+  position:absolute;
+  inset:auto 50% auto auto;
+  width:min(72vw,320px);
+  height:min(72vw,320px);
+  border-radius:50%;
+  transform:translate(50%,-10%);
+  background:radial-gradient(circle, rgba(140,114,57,.24) 0%, rgba(96,126,88,.08) 38%, transparent 72%);
+  filter:blur(6px);
+  opacity:.9;
+  animation:drift 8s var(--ease) infinite alternate;
+}
+.frame-lines::before,.frame-lines::after{
+  content:"";
+  position:absolute;
+  left:16px;right:16px;height:1px;
+  background:linear-gradient(90deg, transparent, rgba(164,135,76,.34), transparent);
+}
+.frame-lines::before{top:calc(var(--safe-top) + 12px)}
+.frame-lines::after{bottom:calc(var(--safe-bottom) + 12px)}
+.center-copy{position:relative;z-index:1;text-align:center}
+.eyebrow{font-size:.68rem;letter-spacing:.34em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:24px}
+.title{
+  font-family:var(--font-story);
+  font-size:clamp(2.6rem, 12vw, 4.4rem);
+  line-height:1.02;
+  color:var(--gold);
+  letter-spacing:.07em;
+  text-wrap:balance;
+}
+.subtitle{
+  margin-top:24px;
+  font-family:var(--font-story);
+  font-size:clamp(.98rem,4.7vw,1.14rem);
+  line-height:1.8;
+  color:var(--ink-soft);
+  font-style:italic;
+}
+.subtle{margin-top:12px;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);line-height:1.8}
+.stack-cta{position:relative;z-index:1;display:flex;flex-direction:column;gap:12px;align-items:center;margin-top:36px}
+.btn{
+  width:100%;max-width:none;min-height:52px;
+  background:transparent;border:1px solid var(--line-strong);border-radius:0;
+  text-transform:uppercase;letter-spacing:.28em;font-size:.74rem;
+  color:var(--gold);padding:14px 18px;cursor:pointer;
+  transition:background-color .18s var(--ease), border-color .18s var(--ease), color .18s var(--ease), transform .18s var(--ease);
+}
+.btn:active{background:rgba(139,111,57,.12);transform:translateY(1px);border-color:var(--gold)}
+.btn.secondary{color:var(--ink-soft);border-color:var(--line)}
+.btn.danger{color:var(--danger);border-color:color-mix(in oklab, var(--danger) 45%, var(--line))}
+.panel-box{
+  width:min(100%, 100%);
+  margin:0 auto;
+  position:relative;
+  z-index:1;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(17,22,18,.88), rgba(10,13,10,.95));
+  box-shadow:var(--shadow);
+  padding:24px 16px;
+}
+.panel-title{font-family:var(--font-story);font-size:1.55rem;color:var(--gold);margin-bottom:12px;letter-spacing:.04em;line-height:1.2}
+.panel-copy{font-size:.82rem;line-height:1.9;color:var(--ink-soft);max-width:44ch}
+.field{margin-top:24px}
+.label{display:block;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px}
+.input,.select,.textarea{
+  width:100%;background:rgba(0,0,0,.12);border:1px solid var(--line);
+  min-height:52px;padding:14px 12px;font-size:16px;outline:none;border-radius:0;
+}
+.textarea{resize:none;line-height:1.55;max-height:140px;overflow:auto}
+.input:focus,.textarea:focus{border-color:var(--gold)}
+.error{min-height:18px;margin-top:8px;color:var(--warn);font-size:.72rem;line-height:1.45}
+.note{margin-top:18px;color:var(--ink-faint);font-size:.72rem;line-height:1.8}
+.back-link{margin-top:16px;width:100%}
+.traits{display:grid;grid-template-columns:1fr;gap:12px;margin-top:20px}
+.trait{
+  border:1px solid var(--line);
+  padding:14px 14px 16px;
+  background:rgba(255,255,255,.015);
+  cursor:pointer;
+  transition:border-color .18s var(--ease), background-color .18s var(--ease);
+  min-height:96px;
+}
+.trait.active{border-color:var(--gold);background:rgba(139,111,57,.08)}
+.trait-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.trait-name{font-size:.76rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink);line-height:1.5}
+.trait-tag{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dim);line-height:1.5}
+.trait-copy{margin-top:8px;font-family:var(--font-story);font-size:.98rem;line-height:1.6;color:var(--ink-soft)}
+#game{flex-direction:column;overflow:hidden;min-height:0}
+#header{
+  flex-shrink:0;
+  display:flex;align-items:center;gap:8px;
+  min-height:calc(56px + var(--safe-top));
+  padding:calc(var(--safe-top) + 8px) 12px 8px;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(11,14,11,.96), rgba(13,18,14,.9));
+}
+.hdot{width:4px;height:4px;border-radius:50%;background:var(--gold-dim);flex:0 0 auto}
+.htitle{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34vw}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:2px;position:relative}
+.save-status{font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);min-width:54px;text-align:right}
+.save-status.saved{color:var(--ok)}
+.save-status.loaded{color:var(--gold-dim)}
+.save-status.error{color:var(--danger)}
+.icon-btn{
+  min-width:48px;min-height:48px;border:none;background:transparent;color:var(--gold);
+  font-size:1.05rem;display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.icon-btn:active{opacity:.6}
+.dropdown{position:relative}
+.panel{
+  display:none;position:fixed;top:0;left:0;min-width:220px;max-width:min(280px, calc(100vw - 16px));
+  border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);z-index:50;
+}
+.panel.open{display:flex;flex-direction:column}
+.pitem{
+  border:none;border-bottom:1px solid rgba(255,255,255,.03);background:transparent;text-align:left;
+  min-height:48px;padding:14px 16px;color:var(--ink-soft);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer
+}
+.pitem:last-child{border-bottom:none}
+.pitem:active{background:rgba(139,111,57,.1);color:var(--gold)}
+.pitem.danger{color:var(--danger)}
+.vol-row{display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:48px}
+.vol-label{font-size:.66rem;letter-spacing:.16em;color:var(--ink-faint)}
+input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
+.scene-label-panel{padding:0 16px 14px;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);line-height:1.6}
+.narrator-notes-panel{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:min(calc(100vw - 16px), 320px);
+  max-height:min(60vh, 420px);
+  overflow:auto;
+  border:1px solid var(--line);
+  background:var(--surface);
+  box-shadow:var(--shadow);
+  z-index:55;
+}
+.narrator-notes-panel.open{display:block}
+.narrator-notes-head{
+  padding:14px 16px 10px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  color:var(--gold-dim);
+  font-size:.68rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+.narrator-notes-list{
+  padding:12px 16px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.narrator-note-item{
+  border:1px solid rgba(255,255,255,.05);
+  padding:12px;
+  background:rgba(255,255,255,.02);
+}
+.narrator-note-topic{
+  font-size:.68rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin-bottom:6px;
+}
+.narrator-note-data{
+  font-family:var(--font-story);
+  font-size:.95rem;
+  line-height:1.62;
+  color:var(--ink);
+}
+.narrator-note-empty{
+  padding:16px;
+  color:var(--ink-soft);
+  font-size:.84rem;
+  line-height:1.8;
+}
+#scene-banner{
+  flex-shrink:0;
+  border-bottom:1px solid var(--line);
+  padding:12px 12px;
+  background:linear-gradient(90deg, rgba(76,95,63,.16), rgba(102,77,44,.09));
+}
+.scene-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.scene-place{font-family:var(--font-story);font-size:1.14rem;color:var(--ink);line-height:1.3}
+.scene-meta{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);line-height:1.6;text-align:right;max-width:48%}
+#chat{
+  flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;
+  padding:18px 12px 8px;
+  display:flex;flex-direction:column;gap:18px;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+}
+.msg{animation:fadeIn .32s var(--ease)}
+.msg-narrator .meta{font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:10px}
+.msg-player{padding-left:12px;border-left:1px solid var(--line)}
+.msg-player .meta{font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;color:var(--player-soft);margin-bottom:8px}
+.story{
+  font-family:var(--font-story);
+  font-size:clamp(1rem,4.7vw,1.08rem);
+  line-height:1.82;
+  color:var(--ink);
+  text-wrap:pretty;
+}
+.story p{margin:0 0 12px}
+.story p:last-child{margin-bottom:0}
+.player-text{font-size:.95rem;line-height:1.58;font-style:italic;color:var(--player)}
+.system-chip{
+  align-self:flex-start;
+  font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-soft);padding:10px 12px;border:1px solid var(--line);background:rgba(255,255,255,.02);min-height:40px;display:flex;align-items:center;
+}
+.typing{display:flex;gap:6px;padding:2px 0 8px;min-height:24px;align-items:center}
+.typing span{width:8px;height:8px;border-radius:50%;background:var(--gold-dim);opacity:.24;animation:pulse 1.2s ease-in-out infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+#quick-actions{padding:0 12px 12px;display:flex;gap:8px;overflow:auto;flex-shrink:0;scrollbar-width:none}
+#quick-actions::-webkit-scrollbar{display:none}
+.quick-btn{
+  border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--ink-soft);min-height:48px;
+  padding:12px 14px;white-space:nowrap;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;justify-content:center
+}
+.quick-btn:active{border-color:var(--gold);color:var(--gold)}
+#input-wrap{
+  flex-shrink:0;display:flex;align-items:flex-end;border-top:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(10,13,10,.98), rgba(11,14,11,.96));padding-bottom:var(--safe-bottom)
+}
+#input{
+  flex:1;border:none;background:transparent;min-height:56px;max-height:124px;padding:14px 12px 16px;
+  font-size:16px;line-height:1.5;resize:none;outline:none;color:var(--ink)
+}
+#input::placeholder{color:var(--ink-faint)}
+#send-btn{
+  flex-shrink:0;min-width:56px;min-height:56px;align-self:stretch;border:none;border-left:1px solid var(--line);
+  background:transparent;color:var(--gold);font-size:1.35rem;cursor:pointer
+}
+#send-btn:disabled{opacity:.28}
+#send-btn:active:not(:disabled){background:rgba(139,111,57,.12)}
+#death-overlay{
+  display:none;position:absolute;inset:0;z-index:80;background:rgba(7,8,7,.92);padding:16px;align-items:center;justify-content:center
+}
+#death-overlay.open{display:flex}
+.death-box{width:min(100%,520px);border:1px solid color-mix(in oklab, var(--danger) 48%, var(--line));padding:24px 16px;background:linear-gradient(180deg, rgba(27,11,11,.88), rgba(15,8,8,.96));box-shadow:var(--shadow)}
+.death-box h2{font-family:var(--font-story);font-size:1.8rem;color:oklch(0.72 0.06 35);margin-bottom:16px;line-height:1.2}
+.death-box p{font-family:var(--font-story);font-size:1rem;line-height:1.76;color:var(--ink-soft);margin-bottom:14px}
+.death-box .btn{max-width:none;margin-top:10px}
+.hidden{display:none!important}
+@keyframes pulse{0%,100%{opacity:.2;transform:translateY(0)}50%{opacity:1;transform:translateY(-2px)}}
+@keyframes drift{0%{transform:translate(50%,-10%) scale(1)}100%{transform:translate(50%,-4%) scale(1.08)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@media (max-width:380px){
+  :root{ --screen-pad:14px; }
+  .title{font-size:clamp(2.3rem, 11.5vw, 3.6rem)}
+  .panel-title{font-size:1.42rem}
+  .panel-box{padding:22px 14px}
+  .scene-row{align-items:flex-start;flex-direction:column;gap:6px}
+  .scene-meta{max-width:none;text-align:left}
+  .htitle{max-width:28vw}
+  .save-status{display:none}
+}
+@media (min-width:413px){
+  #app{max-width:412px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <section id="splash" class="screen active frame-lines">
+    <div class="orb"></div>
+    <div class="center-copy">
+      <div class="eyebrow">archivo real de ardenhall</div>
+      <h1 class="title">CRÓNICAS<br>DE AVALORIA</h1>
+      <p class="subtitle">No gobierna el mundo.<br>Vive dentro de él.</p>
+      <p class="subtle">Veridonia, año 763 del calendario avaloriano</p>
+    </div>
+    <div class="stack-cta">
+      <button class="btn" id="btn-start">Comenzar</button>
+      <button class="btn secondary hidden" id="btn-continue">Continuar partida guardada</button>
+    </div>
+  </section>
+
+  <section id="apiscreen" class="screen frame-lines">
+    <div class="orb"></div>
+    <div class="panel-box">
+      <h2 class="panel-title">Clave del Narrador</h2>
+      <p class="panel-copy">Para despertar al Narrador necesita una clave de Groq. Hágalo así: entre a <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">console.groq.com/keys</a>, cree su cuenta, genere una API key y péguela acá.</p>
+      <div class="field">
+        <label class="label" for="api-key-input">Clave API</label>
+        <input class="input" id="api-key-input" type="password" placeholder="gsk_..." autocomplete="off" />
+        <div class="error" id="api-error"></div>
+      </div>
+      <button class="btn" id="btn-api-confirm" style="margin-top:18px;max-width:none">Confirmar</button>
+      <p class="note">La clave se guarda solo en este navegador, en localStorage. El juego no tiene servidor propio.</p>
+    </div>
+    <div class="stack-cta back-link"><button class="btn secondary" id="btn-back-splash">← Volver</button></div>
+  </section>
+
+  <section id="charscreen" class="screen frame-lines">
+    <div class="orb"></div>
+    <div class="panel-box">
+      <h2 class="panel-title">Su nombre entre los caminos</h2>
+      <p class="panel-copy">Elija un nombre y hasta tres rasgos. Lo demás queda bajo la piel: el mundo va a notar sus inclinaciones, usted no va a ver números. Como corresponde.</p>
+      <div class="field">
+        <label class="label" for="char-name">Nombre</label>
+        <input class="input" id="char-name" type="text" maxlength="28" placeholder="Nombre del personaje" />
+      </div>
+      <div class="field">
+        <span class="label">Rasgos</span>
+        <div class="traits" id="traits"></div>
+        <div class="error" id="char-error"></div>
+      </div>
+      <button class="btn" id="btn-begin-game" style="margin-top:22px;max-width:none">Entrar en Veridonia</button>
+    </div>
+  </section>
+
+  <section id="game" class="screen">
+    <header id="header">
+      <span class="hdot"></span>
+      <span class="htitle" id="header-title">CRÓNICAS DE AVALORIA</span>
+      <span class="hdot"></span>
+      <div class="header-right">
+        <span class="save-status" id="save-status"></span>
+        <div class="dropdown">
+          <button class="icon-btn" id="btn-save-toggle" aria-label="Menú de guardado" aria-expanded="false">💾</button>
+          <div class="panel" id="panel-save">
+            <button class="pitem" id="pitem-save">Guardar partida</button>
+            <button class="pitem" id="pitem-load-save">Cargar partida</button>
+            <button class="pitem" id="pitem-notes">Notas del narrador</button>
+            <button class="pitem danger" id="pitem-delete">Borrar guardado</button>
+            <button class="pitem" id="pitem-apikey">Cambiar API key</button>
+          </div>
+          <div class="narrator-notes-panel" id="panel-narrator-notes">
+            <div class="narrator-notes-head">Notas del narrador</div>
+            <div class="narrator-notes-list" id="narrator-notes-list"></div>
+          </div>
+        </div>
+        <div class="dropdown">
+          <button class="icon-btn" id="btn-audio-toggle" aria-label="Menú de audio" aria-expanded="false">🔊</button>
+          <div class="panel" id="panel-audio">
+            <button class="pitem" id="pitem-mute">Silenciar</button>
+            <div class="vol-row"><span class="vol-label">VOL</span><input id="vol-slider" type="range" min="0" max="1" step="0.05" value="0.5" /></div>
+            <div class="scene-label-panel" id="scene-label-panel">sin audio procedural, por ahora</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="scene-banner">
+      <div class="scene-row">
+        <div class="scene-place" id="scene-place">Ardenhall</div>
+        <div class="scene-meta" id="scene-meta">mañana tenue · primavera · año 763 A.A.</div>
+      </div>
+    </section>
+
+    <main id="chat"></main>
+    <div id="quick-actions"></div>
+    <div id="input-wrap">
+      <textarea id="input" rows="2" placeholder="¿Qué hace?"></textarea>
+      <button id="send-btn" disabled>↵</button>
+    </div>
+  </section>
+
+  <div id="death-overlay">
+    <div class="death-box">
+      <h2>El camino se cerró</h2>
+      <div id="death-summary"></div>
+      <button class="btn" id="btn-new-life">Comenzar otra vida</button>
+    </div>
+  </div>
+</div>
+<script>
+const STORAGE_KEYS = {
+  apiKey: 'avaloriaGroqApiKey',
+  world: 'worldChronicle',
+  character: 'personajeState',
+  save: 'avaloriaSaveSlot',
+  audio: 'avaloriaAudioPrefs'
+};
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const GROQ_ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions';
+const TEST_PROMPT = 'Responda solo con la palabra: listo';
+const START_YEAR = 763;
+const START_DATE = { year: START_YEAR, season: 'primavera', day: 12, hour: 8 };
+const MAX_MEMORABLE_FACTS = 4;
+const MAX_MESSAGE_HISTORY = 18;
+const MAX_SCENE_TAG = 40;
+const HISTORICAL_TYPES = [
+  'muerte_figura_autoridad',
+  'fundacion_destruccion_asentamiento',
+  'caida_gran_casa',
+  'desaparicion_personaje_relevante',
+  'descubrimiento_unico'
+];
+const SCENE_FALLBACK = 'ciudad';
+const LOCATION_ORDER = ['ardenhall','lareth','halenor'];
+const TRAVEL_HOURS = {
+  ardenhall: { lareth: 36, halenor: 52 },
+  lareth: { ardenhall: 36, halenor: 44 },
+  halenor: { ardenhall: 52, lareth: 44 }
+};
+const MONEY_BASE = { bronce: 180, plata: 12, oro: 0, platino: 0, monarca: 0 };
+const PRICE_REFERENCE = {
+  pan_duro: { bronce: 5 },
+  pan_fresco: { bronce: 10 },
+  posada_humilde: { plata: 5 },
+  posada_lujo: { plata: 80 },
+  lectura_archivo: { plata: 1 },
+  caballo_mensajeria: { oro: 18 }
+};
+const TRAITS = [
+  {
+    id:'paciente', name:'Paciente', tag:'temple', copy:'Escucha antes de hablar. Las decisiones le pesan, pero rara vez lo arrastran.',
+    mods:{ juicio:2, temple:2, trato:1, vigor:-1 }
+  },
+  {
+    id:'astuto', name:'Astuto', tag:'calculo', copy:'Lee grietas en la gente y en los tratos. A veces llega a la verdad por los bordes.',
+    mods:{ juicio:2, trato:2, erudicion:1, honor:-1 }
+  },
+  {
+    id:'robusto', name:'Robusto', tag:'cuerpo', copy:'El cansancio tarda más en encontrarlo. El dolor lo encuentra igual, pero discute un rato.',
+    mods:{ vigor:3, temple:1, erudicion:-1 }
+  },
+  {
+    id:'curioso', name:'Curioso', tag:'pregunta', copy:'Le cuesta dejar una puerta cerrada y una frase a medio entender.',
+    mods:{ erudicion:3, juicio:1, temple:-1 }
+  },
+  {
+    id:'devoto', name:'Devoto del Equilibrio', tag:'fe', copy:'Le pesa el juramento, el silencio y la idea de que todo intercambio deja marca.',
+    mods:{ honor:3, temple:1, trato:1 }
+  },
+  {
+    id:'arrebatado', name:'Arrebatado', tag:'impulso', copy:'No siempre espera a que el mundo termine de explicarse.',
+    mods:{ vigor:1, trato:-1, juicio:-2, honor:1 }
+  }
+];
+const LOCATIONS = {
+  ardenhall: {
+    id:'ardenhall', name:'Ardenhall', scene:'ciudad', regionMod:1.02,
+    desc:'La capital huele a papel seco, pan reciente y piedra lavada. Los barrios discuten entre sí sin levantar la voz.',
+    npcs:[
+      { id:'maren_archivista', nombre:'Maren de Orst', rol:'archivista del Archivo Real', afinidadGeneral:0, hechosMemorables:[], voz:'corta, precisa, poco amiga del exceso' },
+      { id:'serel_panadero', nombre:'Serel Norlen', rol:'panadero del Mercado Circular', afinidadGeneral:0, hechosMemorables:[], voz:'seca, hospitalaria al final' }
+    ],
+    quick:['Ir al Mercado Circular','Hablar con alguien del Archivo','Dormir en una posada humilde','Leer extensamente en una sala pública']
+  },
+  lareth: {
+    id:'lareth', name:'Lareth', scene:'mercado', regionMod:0.97,
+    desc:'Lareth no duerme. Las campanas llegan antes de tiempo y los tratos antes del nombre.',
+    npcs:[
+      { id:'ivor_cambista', nombre:'Ivor Aster', rol:'cambista y prestamista menor', afinidadGeneral:0, hechosMemorables:[], voz:'amable de superficie, exacto con cada palabra' },
+      { id:'naela_tabernera', nombre:'Naela Riven', rol:'tabernera de turno nocturno', afinidadGeneral:0, hechosMemorables:[], voz:'rápida, burlona, nada ingenua' }
+    ],
+    quick:['Regatear por pan fresco','Buscar noticias del comercio','Dormir unas horas','Viajar a Ardenhall']
+  },
+  halenor: {
+    id:'halenor', name:'Halenor', scene:'conocimiento', regionMod:1.05,
+    desc:'Halenor suena a tiza, pasos medidos y hojas pasadas con cuidado. Acá una pregunta vale más que una pose.',
+    npcs:[
+      { id:'tiren_docente', nombre:'Tiren Selvan', rol:'docente de cartografía', afinidadGeneral:0, hechosMemorables:[], voz:'calma, afilada, no regala certezas' },
+      { id:'elia_bibliotecaria', nombre:'Elia Miren', rol:'bibliotecaria pública', afinidadGeneral:0, hechosMemorables:[], voz:'amable, filosa con la pereza intelectual' }
+    ],
+    quick:['Leer extensamente','Preguntar por una anomalía','Dormir en una pensión sobria','Viajar a Lareth']
+  }
+};
+
+const ABSOLUTE_LORE = {
+  "version": "1.0",
+  "notas": "Fichas de canon absoluto extraídas de los cinco tomos. Foco en Veridonia (jugable en el MVP). Caelumia y Aetheria llevan entradas livianas para que el narrador no las contradiga si aparecen mencionadas. 'misterioPermanente': true marca contenido que el juego nunca debe resolver, ni ahora ni en eventos de mundo futuros.",
+  "fichas": [
+    { "id": "avaloria_general", "categoria": "concepto", "region": "avaloria", "etiquetas": ["nacion", "dos_coronas", "tratado"], "resumenCorto": "Avaloria es una única nación dividida en dos reinos soberanos desde el Tratado de las Dos Coronas (Año 500 A.A.): Veridonia y Caelumia. Comparten moneda, idioma oficial y ciudadanía; ninguno reclama superioridad sobre el otro.", "fuente": "Vol. I, 3/16 y 4/16" },
+    { "id": "calendario_avaloriano", "categoria": "concepto", "region": "avaloria", "etiquetas": ["tiempo", "fecha"], "resumenCorto": "El Calendario Avaloriano empieza en el Año 0 con la firma del Pacto de la Primera Corona. Año actual de referencia de los tomos: 763 A.A.", "fuente": "Vol. I, 2/16" },
+    { "id": "sistema_monetario", "categoria": "economia", "region": "avaloria", "etiquetas": ["dinero", "moneda", "conversion"], "resumenCorto": "1 Plata = 100 Bronce. 1 Oro = 100 Plata. 1 Platino = 100 Oro. 1 Moneda Monarca = 10.000 Platino (metal Monarita, casi nunca circula, no puede refundirse). Cada moneda lleva el sello de ambas Coronas.", "fuente": "Vol. I, 8/16" },
+    { "id": "precios_referencia", "categoria": "economia", "region": "avaloria", "etiquetas": ["precio", "aproximado"], "resumenCorto": "Referencia aproximada, no fija: pan duro 5 bronce, pan fresco 10 bronce, posada humilde 5 plata/noche, posada de lujo 80 plata/noche, vivienda cómoda ~10 platino, mansión hasta 50 platino, pueblo pequeño ~450 platino, ciudad importante 1000+ platino. Los precios varían por ciudad, estación y circunstancia.", "fuente": "Vol. I, 8/16" },
+    { "id": "tratado_dos_coronas", "categoria": "historia", "region": "avaloria", "etiquetas": ["tratado", "guerra", "año_500"], "resumenCorto": "Firmado bajo el Gran Roble de Ardenhall, otoño del Año 500 A.A., tras 31 años de Guerra de las Dos Coronas (469–500). Puso fin a la Crisis de las Coronas (iniciada ~420 A.A.). Avaloria permanece unida; Veridonia y Caelumia son reinos soberanos con moneda, ciudadanía e idioma compartidos.", "fuente": "Vol. I, 3/16 y 14/16" },
+    { "id": "monarita", "categoria": "material", "region": "avaloria", "etiquetas": ["mineral", "moneda_monarca"], "resumenCorto": "Metal violeta usado para acuñar la Moneda Monarca. Se adhiere a piedra, madera, cristal o hierro sin pegamento y recupera su posición exacta al separarse y volver a acercarse. Nunca pudo refundirse. Nadie sabe con certeza dónde se encontró originalmente; los documentos más antiguos ya lo describen como material antiguo.", "fuente": "Vol. I, 3/16 y 15/16", "misterioPermanente": true },
+    { "id": "reino_veridonia", "categoria": "region", "region": "veridonia", "etiquetas": ["reino", "bosque"], "resumenCorto": "Reino Verde, tierras septentrionales y occidentales de Avaloria. Bosques, praderas, ríos y ciudades construidas alrededor de ríos, no de fortalezas. Carácter paciente, comerciante, poco dado a la ostentación.", "fuente": "Vol. I, 1/16" },
+    { "id": "limites_veridonia", "categoria": "geografia", "region": "veridonia", "etiquetas": ["frontera", "montana", "oceano"], "resumenCorto": "Norte: Montañas Blancas. Oeste: Gran Océano Verde. Este: Cordilleras Gemelas (frontera con Caelumia). Sur: ríos y bosques que se mezclan con llanuras.", "fuente": "Vol. I, 1/16" },
+    { "id": "casa_elarion", "categoria": "corona", "region": "veridonia", "etiquetas": ["dinastia", "corona", "gobierno"], "resumenCorto": "Única dinastía que gobernó Veridonia desde la Fundación. Lema: 'El bosque crece más lento que la ambición'. Todo heredero hace el Viaje Verde (un año recorriendo el reino sin revelar su identidad) antes de ser coronado. Todos los Elarion aprenden un oficio manual.", "fuente": "Vol. I, 5/16; Vol. IV, 2/16" },
+    { "id": "rey_actual_veridonia", "categoria": "gobierno", "region": "veridonia", "etiquetas": ["rey", "actual"], "resumenCorto": "Edric V Elarion, rey actual de Veridonia (gobierna desde hace 35 años, 59 años de edad). Recorre el Mercado Viejo de incógnito cada otoño. Este dato es CANON DINÁMICO: puede cambiar por consecuencias del juego, ver WorldChronicle.", "fuente": "Vol. IV, 2/16; Vol. V, 5/16", "canonDinamico": true },
+    { "id": "guardianes_roble", "categoria": "institucion", "region": "veridonia", "etiquetas": ["orden", "arboles", "archivo"], "resumenCorto": "Orden que protege caminos, archivos, puentes históricos, árboles sagrados y mensajeros reales. No son el ejército del rey. Nunca desenvainan mientras exista una solución mediante palabras. Capas verdes oscuras sin insignias militares.", "fuente": "Vol. I, 5/16; Vol. IV, 2/16" },
+    { "id": "guardia_verde", "categoria": "institucion", "region": "veridonia", "etiquetas": ["ejercito"], "resumenCorto": "Ejército permanente de Veridonia. Capas verdes oscuras, armaduras de acero pulido. Juramento: 'Serviremos al reino incluso de un rey equivocado.'", "fuente": "Vol. I, 5/16" },
+    { "id": "permiso_cruzar_caelumia", "categoria": "regla", "region": "veridonia", "etiquetas": ["frontera", "viaje", "restriccion"], "resumenCorto": "Ningún ciudadano cruza libremente a Caelumia. Requiere dos permisos (rey de Veridonia + rey de Caelumia), trámite de 4 a 6 meses, y una razón concreta (trabajo, comercio, estudios, reunificación familiar, investigación). Alternativa: la Gran Caravana oficial, cada dos meses.", "fuente": "Vol. I, 12/16" },
+    { "id": "aetheria_permiso", "categoria": "regla", "region": "avaloria", "etiquetas": ["aetheria", "viaje", "restriccion"], "resumenCorto": "Viajar a Aetheria no está prohibido, se desaconseja. Requiere petición formal, pago considerable, contrato de responsabilidad absoluta, y registrar por escrito cada jornada. Respuesta en 1 a 2 meses (más rápido que Caelumia, porque casi nadie lo pide). 'La Corona concede permiso. No garantiza regreso.'", "fuente": "Vol. I, 12/16" },
+    { "id": "ciudad_ardenhall", "categoria": "ciudad", "region": "veridonia", "etiquetas": ["capital", "archivo_real", "universidad", "mercado_circular"], "resumenCorto": "Capital de Veridonia, ~520.000 habitantes. Sede de la Corona, el Archivo Real y la Universidad. Sin plaza central única: decenas de plazas por barrio. El Gran Mercado Circular ocupa casi un kilómetro. El Archivo Real usa piedra y patios abiertos, sin antorchas, cada documento con al menos tres copias.", "fuente": "Vol. I, 7/16" },
+    { "id": "ciudad_lareth", "categoria": "ciudad", "region": "veridonia", "etiquetas": ["comercio", "no_duerme"], "resumenCorto": "La Ciudad del Comercio, ~410.000 habitantes. Nunca duerme: hornos y posadas funcionan toda la noche. Costumbre local: negociar primero, preguntar el nombre después. El Gran Reloj del Mercado suena un minuto antes de lo esperado en noches despejadas, sin explicación (más de 200 años de registro).", "fuente": "Vol. I, 7/16", "misterioPermanente": true },
+    { "id": "ciudad_riverael", "categoria": "ciudad", "region": "veridonia", "etiquetas": ["canales", "flotante"], "resumenCorto": "Ciudad Flotante, ~260.000 habitantes, construida sobre islas unidas por puentes. Los niños aprenden a remar antes que a montar a caballo. Jardines flotantes que nadie posee, mantenidos por voluntarios.", "fuente": "Vol. I, 7/16" },
+    { "id": "ciudad_halenor", "categoria": "ciudad", "region": "veridonia", "etiquetas": ["conocimiento", "universidad", "biblioteca"], "resumenCorto": "Ciudad del Conocimiento, ~190.000 habitantes. Sede de la Universidad Real de Halenor (fundada Año 168 A.A., la institución académica más importante de Avaloria, recibe estudiantes de ambos reinos). Prohibido construir tabernas a menos de 200 pasos de las bibliotecas principales.", "fuente": "Vol. I, 7/16 y 11/16" },
+    { "id": "ciudad_valdor", "categoria": "ciudad", "region": "veridonia", "etiquetas": ["militar", "muralla_viva"], "resumenCorto": "La Fortaleza Verde, ~150.000 habitantes, cerca de las Cordilleras Gemelas. Ciudad militar más importante del reino, pero los jardines ocupan más superficie que los cuarteles. Muralla Viva: árboles crecidos sobre los muros que estabilizan la estructura.", "fuente": "Vol. I, 7/16" },
+    { "id": "ciudad_norhaven", "categoria": "ciudad", "region": "veridonia", "etiquetas": ["puerto", "faro"], "resumenCorto": "El Puerto del Oeste, ~230.000 habitantes. El Faro Mayor es visible a más de 40 km en noches despejadas y nunca dejó de funcionar desde que hay registros; los guardianes nunca explican por qué no se apaga.", "fuente": "Vol. I, 7/16", "misterioPermanente": true },
+    { "id": "pueblo_bran", "categoria": "ciudad", "region": "veridonia", "etiquetas": ["pequeno", "antiguo"], "resumenCorto": "~8.400 habitantes. Nunca cambió de ubicación en más de 700 años; las casas se reconstruyeron siempre sobre los mismos cimientos (cinco niveles arqueológicos hallados debajo).", "fuente": "Vol. I, 7/16" },
+    { "id": "aldeas_bosque_profundo", "categoria": "region", "region": "veridonia", "etiquetas": ["rural", "bosque"], "resumenCorto": "Decenas de asentamientos ocultos entre árboles gigantes, de cien a varios miles de habitantes. Mercados rurales sin ubicación fija, cada seis días. Hospitalidad: agua gratis a todo viajero que llegue antes del anochecer.", "fuente": "Vol. I, 7/16" },
+    { "id": "gran_bosque_elderen", "categoria": "geografia", "region": "veridonia", "etiquetas": ["bosque", "occidente"], "resumenCorto": "Ocupa gran parte del occidente de Veridonia. Sus límites cambian lentamente año a año (claros que aparecen y desaparecen). Contiene Árboles Antiguos (hasta 100 m de altura, imposibles de talar por ley, ni siquiera por orden real).", "fuente": "Vol. I, 10/16" },
+    { "id": "bosque_blanco", "categoria": "geografia", "region": "veridonia", "etiquetas": ["misterio", "corteza_blanca"], "resumenCorto": "Mencionado desde el Año 83 A.A. Árboles de corteza completamente blanca; la madera cortada se desintegra en polvo gris y nunca pudo usarse. Los viajeros sienten un silencio que no corresponde a lo que realmente se escucha ahí.", "fuente": "Vol. I, 2/16 y 10/16", "misterioPermanente": true },
+    { "id": "rio_arlen", "categoria": "geografia", "region": "veridonia", "etiquetas": ["rio", "corazon"], "resumenCorto": "Considerado el corazón de Veridonia, atraviesa más ciudades que ningún otro río. Caudal estable incluso en sequía.", "fuente": "Vol. I, 10/16" },
+    { "id": "lago_espejos", "categoria": "geografia", "region": "veridonia", "etiquetas": ["lago", "norte"], "resumenCorto": "Al norte de Ardenhall. En mañanas sin viento refleja el cielo con tal claridad que no se distingue dónde termina el agua. Tiene una isla central deshabitada donde descansan aves migratorias exactamente tres días cada primavera, sin motivo conocido.", "fuente": "Vol. I, 10/16", "misterioPermanente": true },
+    { "id": "montanas_blancas", "categoria": "geografia", "region": "veridonia", "etiquetas": ["montana", "norte"], "resumenCorto": "Protegen el norte de Veridonia, nevadas todo el año, con pasos inexplorados.", "fuente": "Vol. I, 1/16 y 10/16" },
+    { "id": "puente_viejo", "categoria": "geografia", "region": "veridonia", "etiquetas": ["puente", "antiguo"], "resumenCorto": "Nadie sabe quién lo construyó; ya aparece descrito como 'antiguo' en el primer censo del Año 18 A.A. Un solo arco de piedra, sin grietas, inspeccionado cada cinco años con el mismo informe: 'Estado excelente'.", "fuente": "Vol. I, 10/16", "misterioPermanente": true },
+    { "id": "rio_narell", "categoria": "geografia", "region": "veridonia", "etiquetas": ["rio", "invierno"], "resumenCorto": "En el norte helado, es el único curso de agua que nunca se congela. Su temperatura apenas supera la del entorno; no hay explicación.", "fuente": "Vol. I, 10/16", "misterioPermanente": true },
+    { "id": "nueve_faros", "categoria": "geografia", "region": "veridonia", "etiquetas": ["faro", "costa_occidental"], "resumenCorto": "Nueve faros protegen la costa occidental. Nunca se apagan, ni en tormentas ni cuando se agota el aceite. Nadie encontró explicación; la Corona no lo considera prioritario investigar.", "fuente": "Vol. I, 1/16", "misterioPermanente": true },
+    { "id": "casa_valemont", "categoria": "gran_casa", "region": "veridonia", "etiquetas": ["puentes", "infraestructura"], "resumenCorto": "Lema: 'La palabra pesa más que el acero'. Constructores de caminos y puentes, hoy peajes e infraestructura. Ningún heredero dirige sin haber trabajado un año como obrero en obra pública.", "fuente": "Vol. I, 6/16" },
+    { "id": "casa_aster", "categoria": "gran_casa", "region": "veridonia", "etiquetas": ["finanzas", "banca"], "resumenCorto": "Lema: 'Todo puede contarse'. La Casa más influyente en finanzas: bancos, archivos comerciales, préstamos para expediciones. Jamás prestan sin garantía.", "fuente": "Vol. I, 6/16" },
+    { "id": "casa_lorien", "categoria": "gran_casa", "region": "veridonia", "etiquetas": ["bosques", "viveros"], "resumenCorto": "Lema: 'Donde nace el río'. Protectores históricos de los bosques; son quienes menos árboles talan. Cada nacimiento familiar se celebra plantando un bosque pequeño.", "fuente": "Vol. I, 6/16" },
+    { "id": "casa_dael", "categoria": "gran_casa", "region": "veridonia", "etiquetas": ["diplomacia"], "resumenCorto": "Lema: 'Primero escuchar'. Especialistas en diplomacia y mediación entre comerciantes rivales.", "fuente": "Vol. I, 6/16" },
+    { "id": "casa_riven", "categoria": "gran_casa", "region": "veridonia", "etiquetas": ["mar", "comercio_maritimo"], "resumenCorto": "Lema: 'Toda corriente encuentra salida'. Controlan gran parte del comercio marítimo occidental. Los capitanes hacen sonar una campana antes de zarpar, sin recordar por qué.", "fuente": "Vol. I, 6/16" },
+    { "id": "casa_thalor", "categoria": "gran_casa", "region": "veridonia", "etiquetas": ["canteras", "arquitectura"], "resumenCorto": "Lema: 'La piedra recuerda'. Mineros y arquitectos. Sus edificios siempre dejan una pequeña sección sin pulir, a propósito.", "fuente": "Vol. I, 6/16" },
+    { "id": "casa_elsen", "categoria": "gran_casa", "region": "veridonia", "etiquetas": ["agricultura"], "resumenCorto": "Lema: 'La tierra devuelve'. Grandes productores agrícolas; alimentaron media Avaloria durante la Gran Sequía. Exentos de impuestos sobre sus graneros de emergencia.", "fuente": "Vol. I, 6/16" },
+    { "id": "casa_orst", "categoria": "gran_casa", "region": "veridonia", "etiquetas": ["justicia", "leyes"], "resumenCorto": "Lema: 'Sin ley no hay camino'. Juristas, escribanos y magistrados.", "fuente": "Vol. I, 6/16" },
+    { "id": "casa_miren", "categoria": "gran_casa", "region": "veridonia", "etiquetas": ["conocimiento", "bibliotecas"], "resumenCorto": "Lema: 'El conocimiento viaja'. Financian universidades, bibliotecas y expediciones científicas; permiten acceso gratuito incluso a estudiantes de Caelumia.", "fuente": "Vol. I, 6/16" },
+    { "id": "casa_feral", "categoria": "gran_casa", "region": "veridonia", "etiquetas": ["mensajeria", "caballos"], "resumenCorto": "Lema: 'Ningún camino es largo'. Postas, establos y mensajería. Un mensajero que abre una carta ajena es expulsado permanentemente de la familia.", "fuente": "Vol. I, 6/16" },
+    { "id": "casa_selvan", "categoria": "gran_casa", "region": "veridonia", "etiquetas": ["filosofia", "discreta"], "resumenCorto": "Lema: 'El silencio también enseña'. Poco conocida fuera de la nobleza; profesores y filósofos, casi nunca en documentos públicos.", "fuente": "Vol. I, 6/16" },
+    { "id": "casa_norvell", "categoria": "gran_casa", "region": "veridonia", "etiquetas": ["norte", "exploracion"], "resumenCorto": "Lema: 'Siempre hay otro invierno'. Guardianes del norte; financian a los Exploradores del Norte. Rara vez abandonan esa región.", "fuente": "Vol. I, 6/16; Vol. I, 15/16" },
+    { "id": "doctrina_equilibrio", "categoria": "religion", "region": "avaloria", "etiquetas": ["fe", "templos"], "resumenCorto": "Religión predominante en ambos reinos. Sin dios único ni panteón con rostros definidos. Símbolo: un círculo atravesado por un río. Cuatro enseñanzas: nada permanece inmóvil, todo intercambio modifica a ambas partes, el conocimiento es responsabilidad, ninguna verdad pertenece a un solo hombre. Trata los fenómenos extraordinarios como 'anomalías', nunca milagros oficiales.", "fuente": "Vol. I, 9/16" },
+    { "id": "guardianes_silencio", "categoria": "institucion", "region": "avaloria", "etiquetas": ["mediacion", "doctrina"], "resumenCorto": "Orden de la Doctrina del Equilibrio. Recorren Avaloria escuchando conflictos, sin dictar sentencias ni imponer castigos.", "fuente": "Vol. I, 9/16" },
+    { "id": "circulo_doce", "categoria": "institucion", "region": "veridonia", "etiquetas": ["ciencia", "academia"], "resumenCorto": "Sociedad académica independiente de la Corona, los templos y las Grandes Casas. Revisa cualquier descubrimiento extraordinario antes de aceptarlo oficialmente.", "fuente": "Vol. I, 15/16" },
+    { "id": "universidad_caminos", "categoria": "institucion", "region": "veridonia", "etiquetas": ["viajeros", "conocimiento_informal"], "resumenCorto": "Red informal sin edificio propio: mercaderes, exploradores, cartógrafos y viajeros que intercambian observaciones en cuadernos guardados en las posadas importantes.", "fuente": "Vol. I, 15/16" },
+    { "id": "principio_halenor", "categoria": "concepto", "region": "veridonia", "etiquetas": ["academia", "cita"], "resumenCorto": "Grabado en la entrada de la Universidad de Halenor: 'Observa dos veces. Escribe una. Afirma solamente aquello que estés dispuesto a defender dentro de cien años.' Regla de los cartógrafos: nunca completar un mapa con imaginación; escribir 'información insuficiente' cuando corresponde.", "fuente": "Vol. I, 15/16" },
+    { "id": "año_silencio", "categoria": "historia", "region": "avaloria", "etiquetas": ["fenomeno", "año_684"], "resumenCorto": "Noche del 23 de verano del Año 684 A.A.: ningún animal emitió sonido en toda Avaloria durante ~7 horas. Más de 400 testimonios independientes. Jamás explicado.", "fuente": "Vol. I, 4/16", "misterioPermanente": true },
+    { "id": "estrella_49_anos", "categoria": "fenomeno", "region": "veridonia", "etiquetas": ["astronomia", "halenor"], "resumenCorto": "Cada 49 años aparece una estrella extremadamente brillante durante una sola noche en el Observatorio de Halenor, y desaparece al amanecer. Registrado igual desde hace más de 500 años.", "fuente": "Vol. I, 15/16", "misterioPermanente": true },
+    { "id": "descubrimiento_monarita_historico", "categoria": "historia", "region": "veridonia", "etiquetas": ["año_328", "mineria"], "resumenCorto": "Año 328 A.A.: mineros de las Colinas de Lareth encontraron el primer fragmento de Monarita.", "fuente": "Vol. I, 3/16" },
+    { "id": "aetheria_general", "categoria": "region", "region": "aetheria", "etiquetas": ["isla", "misterio", "no_jugable_mvp"], "resumenCorto": "Isla al oriente de Avaloria, rodeada por una muralla montañosa y un lago interior nunca medido del todo. No pertenece a ningún reino. No jugable en el MVP (fuera del alcance geográfico actual); solo referencia narrativa.", "fuente": "Vol. III, 1/16", "misterioPermanente": true },
+    { "id": "caelumia_general", "categoria": "region", "region": "caelumia", "etiquetas": ["reino", "piedra", "no_jugable_mvp"], "resumenCorto": "La Corona de Piedra, reino hermano de Veridonia al oriente. Capital Karak-Dur. Cultura de permanencia y mantenimiento antes que de crecimiento. No jugable en el MVP; cruzar hasta ahí requiere el permiso descrito en 'permiso_cruzar_caelumia', y mientras no se implemente, toda solicitud del jugador se resuelve con una excusa narrativa (el trámite no avanzó, el rey está ocupado con otro asunto, etc.), nunca con un bloqueo técnico visible.", "fuente": "Vol. II, 1/16" },
+    { "id": "rey_actual_caelumia", "categoria": "gobierno", "region": "caelumia", "etiquetas": ["rey", "actual"], "resumenCorto": "Kaelen IV, rey actual de Caelumia (gobierna hace 32 años, 57 años de edad). Casa Arken.", "fuente": "Vol. II, 3/16", "canonDinamico": true }
+  ]
+};
+const ALWAYS_LORE_IDS = [
+  'avaloria_general',
+  'calendario_avaloriano',
+  'sistema_monetario',
+  'precios_referencia',
+  'tratado_dos_coronas',
+  'monarita',
+  'reino_veridonia',
+  'limites_veridonia',
+  'casa_elarion',
+  'rey_actual_veridonia',
+  'doctrina_equilibrio'
+];
+const LOCATION_LORE_MAP = {
+  ardenhall: 'ciudad_ardenhall',
+  lareth: 'ciudad_lareth',
+  halenor: 'ciudad_halenor'
+};
+const LORE_KEYWORDS = {
+  casa_aster: ['aster','ivor aster','casa aster'],
+  casa_riven: ['riven','naela riven','casa riven'],
+  casa_orst: ['orst','maren de orst','casa orst'],
+  casa_miren: ['miren','elia miren','casa miren'],
+  casa_selvan: ['selvan','tiren selvan','casa selvan'],
+  ciudad_ardenhall: ['ardenhall','archivo real','mercado circular'],
+  ciudad_lareth: ['lareth','gran reloj del mercado'],
+  ciudad_halenor: ['halenor','universidad real de halenor'],
+  guardianes_roble: ['guardianes del roble','guardianes roble'],
+  guardia_verde: ['guardia verde'],
+  monarita: ['monarita','monarca'],
+  tratado_dos_coronas: ['tratado de las dos coronas','dos coronas'],
+  permiso_cruzar_caelumia: ['caelumia','gran caravana'],
+  aetheria_general: ['aetheria'],
+  caelumia_general: ['caelumia','karak-dur'],
+  circulo_doce: ['círculo de doce','circulo de doce'],
+  universidad_caminos: ['universidad de los caminos','universidad caminos'],
+  principio_halenor: ['principio halenor','observa dos veces'],
+  estrella_49_anos: ['estrella','observatorio de halenor'],
+  descumbrimiento_monarita_historico: ['colinas de lareth'],
+  rio_arlen: ['río arlen','rio arlen'],
+  lago_espejos: ['lago espejos','lago de espejos'],
+  montanas_blancas: ['montañas blancas','montanas blancas'],
+  nueve_faros: ['nueve faros'],
+  bosque_blanco: ['bosque blanco'],
+  gran_bosque_elderen: ['gran bosque elderen','elderen']
+};
+const PROMPT_RULES = `Usted es el Narrador de "Crónicas de Avaloria". Habla siempre en segunda persona formal, en español con registro de "usted". Nunca usa voseo ni tuteo. Nunca sale del personaje. Nunca habla como asistente ni explica reglas fuera de la ficción.
+
+REGLA ABSOLUTA DE REGISTRO:
+- Use siempre "usted" y conjugaciones formales.
+- Ejemplos correctos: "tiene" (no "tenés"), "es" (no "sos"), "llega" (no "llegás"), "siente" (no "sentís"), "le queda" (no "te queda"), "puede" (no "podés").
+- Mantenga ese registro también en frases simples sobre salud, dinero, movimiento, opciones y consecuencias.
+
+REGLAS DE ESTILO DE LA PROSA (OBLIGATORIAS):
+- Escriba claro y directo. Diga las cosas como son, sin rodeos.
+- Nada de lenguaje poético ni misterioso por costumbre. Nada de metáforas indirectas que esconden una idea simple debajo de una imagen rebuscada.
+- Si el personaje está sano, dígalo simple: "se siente bien, sin heridas". Si tiene poco dinero, "le queda poco dinero encima". Si nadie lo esperaba, "nadie lo esperaba" y siga.
+- Oraciones cortas. Vocabulario cotidiano. Sin adornos literarios innecesarios, sin frases solemnes ni ceremoniosas.
+- Cuente lo que pasa y lo que el personaje percibe, sin envolverlo en imágenes rebuscadas.
+- Importante: esto es estilo, no contenido. Los misterios del mundo siguen existiendo como argumento (rumores sin confirmar, el enigma de Aetheria, secretos de las Casas, cosas que nadie sabe). Eso se mantiene intacto. Lo que se elimina es la ambigüedad de estilo: no esconda ideas simples bajo prosa rebuscada. Un misterio real se cuenta con palabras claras.
+
+REGLA SOBRE INVENCIÓN DE DATOS:
+- Distinga siempre entre ambientación libre y hechos verificables.
+- Ambientación libre: colores, clima, olores, sonidos, cómo está vestido un NPC hoy, su humor del momento, gente caminando alrededor. Eso puede inventarlo libremente en cada respuesta.
+- Hechos verificables: ubicaciones exactas dentro de una ciudad, direcciones, nombres de sedes o edificios no mencionados en el lore, fechas puntuales, cifras exactas, quién dijo qué en el pasado. Eso no se inventa.
+- Si un hecho verificable no está en el lore relevante de la llamada, ni en el estado del juego, ni fue mencionado antes en la conversación, resuélvalo solo de una de estas formas:
+  1. Dedúzcalo con lógica simple y márquelo como deducción, no como hecho. Ejemplo: "probablemente en algún local del mercado, como la mayoría de las casas comerciales".
+  2. Déjelo abierto explícitamente. Ejemplo: "no hay un dato claro sobre dónde queda exactamente su sede".
+  3. Redirija al jugador a una forma de averiguarlo dentro de la ficción, sin inventar la respuesta por adelantado.
+- Ejemplo de lo que NO debe hacer: afirmar como hecho conocido que la sede principal de la Casa Aster está en el Gran Mercado Circular de Ardenhall si eso no figura en el lore ni en el estado.
+- Ejemplos de lo que SÍ debe hacer en ese caso: decir que probablemente opere en alguna zona comercial sin afirmarlo como dato cerrado; decir que no hay un dato claro sobre la sede exacta; sugerir preguntar a un NPC existente o revisar el Archivo Real.
+
+RED DE CONTENCIÓN PARA DATOS INVENTADOS:
+- Si aun así termina afirmando un dato específico y verificable que no vino del lore relevante ni del estado del juego, debe registrarlo en el JSON bajo "datosInventados".
+- Cada entrada de "datosInventados" debe tener esta forma: { "tema": "string breve", "dato": "string" }.
+- Use un tema corto, estable y reutilizable, por ejemplo: "sede_casa_aster".
+- Registre solo hechos verificables afirmados como concretos. No registre ambientación libre.
+
+CONSTITUCIÓN INQUEBRANTABLE:
+1. El jugador vive una vida dentro de Avaloria, no controla Avaloria.
+2. El mundo no gira alrededor del protagonista.
+3. El canon absoluto nunca se contradice.
+4. Ninguna decisión vuelve imposible continuar la partida: el mundo encuentra una alternativa coherente. Esto no protege de la muerte.
+5. Nunca abandona al personaje.
+6. El jugador nunca ve números de atributos ni estadísticas.
+7. Si el canon calla: primero use lore relevante existente, después deduzca con lógica, después admita en personaje que no se sabe. Nunca invente un dato específico gratis.
+8. Lo que dice un NPC no es automáticamente verdad.
+9. Solo las decisiones importantes dejan huella.
+10. La inmersión manda.
+11. Ningún precio ni consecuencia es universal.
+12. El éxito no está garantizado.
+13. JavaScript tiene la última palabra: usted propone, JS valida.
+14. No favorece al jugador, favorece la coherencia del mundo.
+15. No todo tiene explicación.
+16. Los grandes cambios del canon dinámico deben ser excepcionales.
+
+FORMATO OBLIGATORIO DE RESPUESTA:
+- Primero, 2 a 5 párrafos cortos de prosa narrativa.
+- Luego, en una línea sola, una marca de escena: [SCENE:categoria]
+- Luego, en un bloque JSON válido entre etiquetas exactas <STATE_JSON> y </STATE_JSON>
+- No escriba nada después de </STATE_JSON>
+
+CATEGORÍAS DE ESCENA VÁLIDAS:
+ciudad, mercado, castillo, camino, taberna, bosque, noche, conocimiento, archivo, frontera, puerto
+
+ESQUEMA DEL JSON OBLIGATORIO:
+{
+  "resumenAccion": "string breve",
+  "tipoAccion": "ninguna|dormir|viajar|esperar|leer_extensamente",
+  "horasAAvanzar": 0,
+  "cambiosPersonaje": {
+    "saludDelta": 0,
+    "dineroDelta": {"bronce":0,"plata":0,"oro":0,"platino":0,"monarca":0},
+    "inventarioAgregar": [{"id":"string","nombre":"string","cantidad":1}],
+    "inventarioQuitar": [{"id":"string","cantidad":1}],
+    "ubicacionNueva": null,
+    "memoriaNarrativaAgregar": ["string"],
+    "muerte": false,
+    "causaMuerte": null
+  },
+  "cambiosRelaciones": [
+    {
+      "npcId":"string",
+      "afinidadDelta":0,
+      "hechoMemorable": {"descripcion":"string","impacto":"positivo|negativo|ambiguo"}
+    }
+  ],
+  "hechosConfirmados": ["string"],
+  "hechoHistorico": {
+    "tipo":"muerte_figura_autoridad|fundacion_destruccion_asentamiento|caida_gran_casa|desaparicion_personaje_relevante|descubrimiento_unico|null",
+    "descripcion":"string",
+    "objetivo":"string|null"
+  },
+  "solicitudSucesion": {
+    "requiere": false,
+    "motivo": "string|null"
+  },
+  "opcionesSugeridas": ["string","string","string"],
+  "npcsMencionados": ["string"],
+  "datosInventados": [
+    {"tema":"string breve","dato":"string"}
+  ]
+}
+
+REGLAS DEL JSON:
+- Si algo no corresponde, use null, [], o 0.
+- Nunca ponga dinero o salud extrema sin causa clara.
+- Nunca confirme como hecho lo que un NPC solo rumorea.
+- Si el jugador intenta ir a Caelumia o Aetheria, resuélvalo dentro de la prosa con burocracia, demoras, negativas o alternativas coherentes. No lo bloquee técnicamente. En el JSON no cambie de región fuera de Veridonia.
+- Si propone viajar, ubicacionNueva debe ser ardenhall, lareth o halenor.
+- Si propone dormir, esperar o leer extensamente, horasAAvanzar debe ser coherente.
+- Si hay muerte, cuéntela con sobriedad, sin melodrama, y marque muerte=true.
+- Si afirma por error un hecho verificable inventado, regístrelo en "datosInventados" en esa misma respuesta.`;
+
+function buildLoreIndex(){
+  const byId = {};
+  ABSOLUTE_LORE.fichas.forEach(ficha => { byId[ficha.id] = ficha; });
+  return byId;
+}
+const LORE_BY_ID = buildLoreIndex();
+function normalizeText(str=''){
+  return String(str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+function uniqueStrings(list){
+  return Array.from(new Set((list || []).filter(Boolean)));
+}
+function extractLoreSignals({ ubicacionActual, hechosConfirmados = [], npcsMencionados = [], chatReciente = [] }){
+  const chunks = [];
+  chunks.push(ubicacionActual || '');
+  hechosConfirmados.forEach(item => chunks.push(item));
+  npcsMencionados.forEach(item => chunks.push(item));
+  chatReciente.forEach(item => {
+    if(typeof item === 'string') chunks.push(item);
+    else if(item && typeof item.content === 'string') chunks.push(item.content);
+  });
+  return normalizeText(chunks.join(' \n '));
+}
+function getLocationLoreIds(ubicacionActual){
+  const ids = new Set();
+  const cityId = LOCATION_LORE_MAP[ubicacionActual];
+  if(cityId) ids.add(cityId);
+  const location = LOCATIONS[ubicacionActual];
+  const tagSet = new Set();
+  if(location){
+    tagSet.add(location.id);
+    tagSet.add(normalizeText(location.name));
+    if(location.scene) tagSet.add(normalizeText(location.scene));
+    location.npcs.forEach(npc => {
+      normalizeText(npc.nombre).split(/[^a-z0-9]+/).forEach(token => token && tagSet.add(token));
+      normalizeText(npc.rol).split(/[^a-z0-9]+/).forEach(token => token && tagSet.add(token));
+    });
+  }
+  ABSOLUTE_LORE.fichas.forEach(ficha => {
+    if(ficha.id === cityId){
+      ids.add(ficha.id);
+      return;
+    }
+    const regionMatch = ubicacionActual && ficha.region === 'veridonia';
+    const tags = (ficha.etiquetas || []).map(normalizeText);
+    const directTagMatch = tags.some(tag => tagSet.has(tag));
+    const textBlob = normalizeText(`${ficha.id} ${ficha.resumenCorto || ''}`);
+    const cityMention = location && (textBlob.includes(normalizeText(location.name)) || textBlob.includes(normalizeText(location.id)));
+    if(directTagMatch || cityMention || (regionMatch && cityId && ficha.id === cityId)){
+      ids.add(ficha.id);
+    }
+  });
+  return Array.from(ids);
+}
+function getMentionedLoreIds(ubicacionActual, hechosConfirmados = [], npcsMencionados = [], chatReciente = []){
+  const signals = extractLoreSignals({ ubicacionActual, hechosConfirmados, npcsMencionados, chatReciente });
+  const ids = new Set();
+  Object.entries(LORE_KEYWORDS).forEach(([id, keywords]) => {
+    if(keywords.some(keyword => signals.includes(normalizeText(keyword)))) ids.add(id);
+  });
+  Object.values(LOCATIONS).forEach(location => {
+    location.npcs.forEach(npc => {
+      if(signals.includes(normalizeText(npc.nombre)) || signals.includes(normalizeText(npc.rol))){
+        Object.entries(LORE_KEYWORDS).forEach(([id, keywords]) => {
+          if(keywords.some(keyword => normalizeText(keyword).includes(normalizeText(npc.nombre).split(' ')[0]))) ids.add(id);
+        });
+      }
+    });
+  });
+  return Array.from(ids).filter(id => LORE_BY_ID[id]);
+}
+function buildRelevantLore(ubicacionActual, hechosConfirmados = [], npcsMencionados = [], chatReciente = []){
+  const ids = new Set(ALWAYS_LORE_IDS);
+  getLocationLoreIds(ubicacionActual).forEach(id => ids.add(id));
+  getMentionedLoreIds(ubicacionActual, hechosConfirmados, npcsMencionados, chatReciente).forEach(id => ids.add(id));
+  return Array.from(ids).map(id => LORE_BY_ID[id]).filter(Boolean);
+}
+function buildSystemPrompt(relevantLore){
+  return `${PROMPT_RULES}\n\nLORE ABSOLUTO RELEVANTE PARA ESTA LLAMADA:\n${JSON.stringify({ version: ABSOLUTE_LORE.version, fichas: relevantLore })}`;
+}
+function defaultWorldChronicle(){
+  return {
+    version:1,
+    hechosHistoricos:[],
+    eventosDeMundo:[],
+    vidasAnteriores:[],
+    preciosRegionales: buildRegionalPrices(),
+    canonDinamico:{
+      reyVeridonia:{ nombre:'Edric V Elarion', casa:'Elarion', estado:'vivo', fuente:'canon_inicial' }
+    },
+    canonInventado:[],
+    ultimaVida:0
+  };
+}
+function buildRegionalPrices(){
+  const out = {};
+  Object.values(LOCATIONS).forEach(loc => {
+    const seed = loc.id.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+    const drift = ((seed % 17) - 8) / 100;
+    out[loc.id] = { mod: round2(loc.regionMod + drift), updatedAt: Date.now() };
+  });
+  return out;
+}
+function defaultCharacterState(){
+  return {
+    version:1,
+    vivo:true,
+    personaje:{
+      nombre:'',
+      rasgos:[],
+      atributosInternos:{ vigor:5, juicio:5, trato:5, erudicion:5, temple:5, honor:5 },
+      salud:100,
+      estadoSalud:'ileso'
+    },
+    inventario:[{ id:'ropa_comun', nombre:'Ropa común', cantidad:1 }],
+    dinero:{...MONEY_BASE},
+    relaciones:{},
+    ubicacion:'ardenhall',
+    fechaNarrativa:{...START_DATE},
+    memoriaNarrativa:[],
+    hechosConfirmados:[],
+    opcionesSugeridas:[],
+    chatLog:[],
+    escenaActual:'ciudad',
+    ultimaEscenaEtiqueta:'ciudad'
+  };
+}
+
+let worldChronicle = loadJSON(STORAGE_KEYS.world, defaultWorldChronicle());
+let personajeState = loadJSON(STORAGE_KEYS.character, null);
+let runtime = {
+  intendedAction:'new',
+  loading:false,
+  mute:false,
+  volume:.5,
+  pendingScene:'ciudad'
+};
+const UI_HISTORY_TOKEN = '__avaloria_ui_layer__';
+let uiHistoryDepth = 0;
+let suppressPopHandler = false;
+
+function qs(id){ return document.getElementById(id); }
+function loadJSON(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : structuredClone(fallback);
+  }catch(err){
+    return structuredClone(fallback);
+  }
+}
+function saveJSON(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+function structuredClone(obj){ return JSON.parse(JSON.stringify(obj)); }
+function round2(n){ return Math.round(n*100)/100; }
+function clamp(n,min,max){ return Math.min(max, Math.max(min,n)); }
+function escapeHtml(str=''){ return str.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function setSaveStatus(text, cls=''){ const el=qs('save-status'); el.textContent=text; el.className=`save-status ${cls}`.trim(); }
+function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); qs(id).classList.add('active'); }
+function hasSavedGame(){ return !!localStorage.getItem(STORAGE_KEYS.save) || !!localStorage.getItem(STORAGE_KEYS.character); }
+function hasApiKey(){ return !!localStorage.getItem(STORAGE_KEYS.apiKey); }
+function currentLocation(){ return LOCATIONS[personajeState?.ubicacion || 'ardenhall']; }
+function currentTimeString(){
+  if(!personajeState) return '';
+  const f = personajeState.fechaNarrativa;
+  const hour = `${String(f.hour).padStart(2,'0')}:00`;
+  return `${hour} · ${f.season} · año ${f.year} A.A.`;
+}
+function healthDescription(h){
+  if(h >= 90) return 'ileso';
+  if(h >= 75) return 'magullado';
+  if(h >= 55) return 'resentido';
+  if(h >= 35) return 'dolorido';
+  if(h >= 15) return 'quebrado';
+  return 'al borde del colapso';
+}
+function healthNarrative(h){
+  if(h >= 90) return 'Se siente bien, sin heridas.';
+  if(h >= 75) return 'Tiene algún golpe, pero está entero.';
+  if(h >= 55) return 'Le duele el cuerpo y moverse cuesta.';
+  if(h >= 35) return 'Está bastante lastimado y se cansa rápido.';
+  if(h >= 15) return 'Está muy malherido y le cuesta mantenerse en pie.';
+  return 'Está al borde de la muerte.';
+}
+function formatMoney(m){
+  const parts = [];
+  if(m.monarca) parts.push(`${m.monarca} monarca`);
+  if(m.platino) parts.push(`${m.platino} platino`);
+  if(m.oro) parts.push(`${m.oro} oro`);
+  if(m.plata) parts.push(`${m.plata} plata`);
+  if(m.bronce || !parts.length) parts.push(`${m.bronce} bronce`);
+  return parts.join(', ');
+}
+function normalizeMoney(m){
+  const order = ['bronce','plata','oro','platino','monarca'];
+  const base = { bronce:100, plata:100, oro:100, platino:10000 };
+  order.forEach(k => { m[k] = Math.max(0, Math.floor(m[k] || 0)); });
+  if(m.bronce >= base.bronce){ m.plata += Math.floor(m.bronce/base.bronce); m.bronce %= base.bronce; }
+  if(m.plata >= base.plata){ m.oro += Math.floor(m.plata/base.plata); m.plata %= base.plata; }
+  if(m.oro >= base.oro){ m.platino += Math.floor(m.oro/base.oro); m.oro %= base.oro; }
+  if(m.platino >= base.platino){ m.monarca += Math.floor(m.platino/base.platino); m.platino %= base.platino; }
+  return m;
+}
+function applyMoneyDelta(target, delta){
+  ['bronce','plata','oro','platino','monarca'].forEach(k => {
+    target[k] = Math.max(0, (target[k]||0) + Number(delta?.[k]||0));
+  });
+  return normalizeMoney(target);
+}
+function getNpcMap(){
+  const map={};
+  Object.values(LOCATIONS).forEach(loc=>loc.npcs.forEach(n=>map[n.id]=n));
+  return map;
+}
+function ensureRelations(){
+  const npcMap = getNpcMap();
+  Object.keys(npcMap).forEach(id => {
+    if(!personajeState.relaciones[id]){
+      personajeState.relaciones[id] = { afinidadGeneral:0, hechosMemorables:[] };
+    }
+  });
+  if(!Array.isArray(worldChronicle.canonInventado)) worldChronicle.canonInventado = [];
+}
+function addSystemChip(text){
+  const chip=document.createElement('div'); chip.className='system-chip'; chip.textContent=text; qs('chat').appendChild(chip); scrollChat();
+}
+function addMessage(kind, text, meta=''){
+  const wrap=document.createElement('article'); wrap.className=`msg msg-${kind}`;
+  const m=document.createElement('div'); m.className='meta'; m.textContent=meta || (kind==='player' ? 'Jugador' : 'narrador');
+  wrap.appendChild(m);
+  const body=document.createElement('div'); body.className = kind==='player' ? 'player-text' : 'story';
+  if(kind==='player') body.textContent=text;
+  else body.innerHTML = text.split(/\n{2,}/).map(p=>`<p>${escapeHtml(p).replace(/\n/g,'<br>')}</p>`).join('');
+  wrap.appendChild(body);
+  qs('chat').appendChild(wrap);
+  scrollChat();
+}
+function addTyping(){
+  removeTyping();
+  const wrap=document.createElement('div'); wrap.id='typing'; wrap.className='typing'; wrap.innerHTML='<span></span><span></span><span></span>';
+  qs('chat').appendChild(wrap); scrollChat();
+}
+function removeTyping(){ const t=qs('typing'); if(t) t.remove(); }
+function scrollChat(){ requestAnimationFrame(()=>{ qs('chat').scrollTop = qs('chat').scrollHeight + 200; }); }
+function persistCharacter(){ saveJSON(STORAGE_KEYS.character, personajeState); updateSaveMenu(); setSaveStatus('guardado','saved'); }
+function persistWorld(){ saveJSON(STORAGE_KEYS.world, worldChronicle); renderNarratorNotes(); }
+function saveManual(){ saveJSON(STORAGE_KEYS.save, { worldChronicle, personajeState }); setSaveStatus('guardado','saved'); updateSaveMenu(); }
+function loadManual(){
+  const data = loadJSON(STORAGE_KEYS.save, null);
+  if(!data) return false;
+  worldChronicle = data.worldChronicle || defaultWorldChronicle();
+  personajeState = data.personajeState || defaultCharacterState();
+  if(!Array.isArray(worldChronicle.canonInventado)) worldChronicle.canonInventado = [];
+  persistWorld(); persistCharacter();
+  setSaveStatus('cargado','loaded');
+  return true;
+}
+function deleteManual(){ localStorage.removeItem(STORAGE_KEYS.save); updateSaveMenu(); setSaveStatus('sin guardado',''); }
+function updateSaveMenu(){
+  const has = !!localStorage.getItem(STORAGE_KEYS.save);
+  const saved = hasSavedGame();
+  qs('btn-continue').classList.toggle('hidden', !saved);
+  qs('btn-start').classList.toggle('hidden', saved);
+  qs('pitem-load-save').style.display = has ? 'block':'none';
+  qs('pitem-delete').style.display = has ? 'block':'none';
+}
+function getOpenPanels(){
+  return Array.from(document.querySelectorAll('.panel.open, .narrator-notes-panel.open'));
+}
+function clearUiHistoryEntry(){
+  if(uiHistoryDepth > 0){
+    uiHistoryDepth = 0;
+    if(history.state && history.state[UI_HISTORY_TOKEN]){
+      suppressPopHandler = true;
+      history.replaceState(null, '', location.href);
+      setTimeout(()=>{ suppressPopHandler = false; }, 0);
+    }
+  }
+}
+function syncUiHistory(){
+  const hasOpen = getOpenPanels().length > 0;
+  if(hasOpen && uiHistoryDepth === 0){
+    uiHistoryDepth = 1;
+    history.pushState({ [UI_HISTORY_TOKEN]: true }, '', location.href);
+  }else if(!hasOpen){
+    clearUiHistoryEntry();
+  }
+}
+function closePanels(skipHistorySync=false){
+  document.querySelectorAll('.panel, .narrator-notes-panel').forEach(p=>{
+    p.classList.remove('open');
+    p.style.display = '';
+  });
+  qs('btn-save-toggle').setAttribute('aria-expanded','false');
+  qs('btn-audio-toggle').setAttribute('aria-expanded','false');
+  if(!skipHistorySync) clearUiHistoryEntry();
+}
+function positionFloatingPanel(panel, anchor){
+  if(!panel || !anchor) return;
+  const panelStyle = panel.style;
+  panelStyle.visibility = 'hidden';
+  panelStyle.display = panel.classList.contains('open') ? (panel.classList.contains('narrator-notes-panel') ? 'block' : 'flex') : panelStyle.display;
+  const margin = 8;
+  const anchorRect = anchor.getBoundingClientRect();
+  const panelRect = panel.getBoundingClientRect();
+  const width = panelRect.width || Math.min(280, window.innerWidth - margin * 2);
+  const height = panelRect.height || 240;
+  let left = anchorRect.right - width;
+  left = Math.max(margin, Math.min(left, window.innerWidth - width - margin));
+  let top = anchorRect.bottom + 6;
+  const maxTop = window.innerHeight - height - margin;
+  if(top > maxTop){
+    top = Math.max(margin, anchorRect.top - height - 6);
+  }
+  panelStyle.left = `${Math.round(left)}px`;
+  panelStyle.top = `${Math.round(Math.max(margin, top))}px`;
+  panelStyle.visibility = '';
+}
+function openPanel(panel, anchor){
+  if(!panel) return;
+  const isNotes = panel.id === 'panel-narrator-notes';
+  if(panel.classList.contains('open')){
+    closePanels();
+    return;
+  }
+  closePanels(true);
+  panel.classList.add('open');
+  positionFloatingPanel(panel, anchor);
+  if(panel.id === 'panel-save') qs('btn-save-toggle').setAttribute('aria-expanded','true');
+  if(panel.id === 'panel-audio') qs('btn-audio-toggle').setAttribute('aria-expanded','true');
+  if(isNotes) qs('btn-save-toggle').setAttribute('aria-expanded','true');
+  syncUiHistory();
+}
+function handleUiBackNavigation(){
+  if(getOpenPanels().length){
+    closePanels(true);
+    clearUiHistoryEntry();
+    return true;
+  }
+  return false;
+}
+function renderNarratorNotes(){
+  const list = qs('narrator-notes-list');
+  if(!list) return;
+  const items = Array.isArray(worldChronicle.canonInventado) ? worldChronicle.canonInventado : [];
+  if(!items.length){
+    list.innerHTML = '<div class="narrator-note-empty">Todavía no hay datos inventados fijados.</div>';
+    return;
+  }
+  list.innerHTML = items.map(item => `
+    <div class="narrator-note-item">
+      <div class="narrator-note-topic">${escapeHtml(item.tema || '')}</div>
+      <div class="narrator-note-data">${escapeHtml(item.dato || '')}</div>
+    </div>
+  `).join('');
+}
+
+function advanceTime(hours){
+  let h = Number(hours||0);
+  if(!h || h < 0) return;
+  while(h > 0){
+    personajeState.fechaNarrativa.hour += 1;
+    if(personajeState.fechaNarrativa.hour >= 24){
+      personajeState.fechaNarrativa.hour = 0;
+      personajeState.fechaNarrativa.day += 1;
+      if(personajeState.fechaNarrativa.day > 90){
+        personajeState.fechaNarrativa.day = 1;
+        personajeState.fechaNarrativa.season = nextSeason(personajeState.fechaNarrativa.season);
+        if(personajeState.fechaNarrativa.season === 'primavera') personajeState.fechaNarrativa.year += 1;
+      }
+    }
+    h -= 1;
+  }
+}
+function nextSeason(s){ return ({primavera:'verano',verano:'otoño',otoño:'invierno',invierno:'primavera'})[s] || 'primavera'; }
+function regionPrice(itemId, locId){
+  const base = PRICE_REFERENCE[itemId] || { bronce:1 };
+  const mod = worldChronicle.preciosRegionales?.[locId]?.mod || 1;
+  const result = { bronce:0, plata:0, oro:0, platino:0, monarca:0 };
+  Object.keys(base).forEach(k => { result[k] = Math.max(0, Math.round(base[k]*mod)); });
+  return normalizeMoney(result);
+}
+
+function renderTraits(){
+  const selected = new Set((window.__selectedTraits)||[]);
+  qs('traits').innerHTML = TRAITS.map(t => `
+    <button class="trait ${selected.has(t.id)?'active':''}" data-trait="${t.id}" type="button">
+      <div class="trait-head"><span class="trait-name">${t.name}</span><span class="trait-tag">${t.tag}</span></div>
+      <div class="trait-copy">${t.copy}</div>
+    </button>`).join('');
+  qs('traits').querySelectorAll('.trait').forEach(btn => btn.addEventListener('click', () => toggleTrait(btn.dataset.trait)));
+}
+function toggleTrait(id){
+  const arr = window.__selectedTraits || [];
+  const idx = arr.indexOf(id);
+  if(idx >= 0) arr.splice(idx,1);
+  else if(arr.length < 3) arr.push(id);
+  window.__selectedTraits = arr;
+  renderTraits();
+}
+function createCharacter(){
+  const name = qs('char-name').value.trim();
+  const selected = window.__selectedTraits || [];
+  if(!name){ qs('char-error').textContent = 'Elija un nombre para su personaje.'; return false; }
+  if(selected.length === 0){ qs('char-error').textContent = 'Elija al menos un rasgo.'; return false; }
+  qs('char-error').textContent='';
+  personajeState = defaultCharacterState();
+  personajeState.personaje.nombre = name;
+  personajeState.personaje.rasgos = selected.slice();
+  selected.forEach(id => {
+    const trait = TRAITS.find(t=>t.id===id);
+    Object.entries(trait.mods).forEach(([k,v]) => { personajeState.personaje.atributosInternos[k] += v; });
+  });
+  ensureRelations();
+  persistCharacter();
+  persistWorld();
+  return true;
+}
+
+function buildGroqError(errorText, status){
+  const raw = String(errorText || '').trim();
+  const lower = raw.toLowerCase();
+  const code = Number(status) || 0;
+  if(/failed to fetch|networkerror|load failed|network request failed|cors/i.test(raw)){
+    return 'No se pudo conectar. Puede ser un problema de red o un bloqueo CORS del navegador. Pruebe con otro navegador o sirva el archivo desde un host simple.';
+  }
+  if(code === 429 || /rate limit|too many requests|quota/i.test(lower)){
+    return 'El Narrador está saturado por ahora (límite de uso de la clave). Espere un momento y pruebe de nuevo.';
+  }
+  if(code === 400 && /(model_not_found|does not exist|model.*not found|invalid model|unknown model)/i.test(raw)){
+    return 'Hay un problema con la configuración del Narrador (modelo no disponible). Avise para que se revise.';
+  }
+  if(code === 401 || /unauthorized|invalid api key|authentication/i.test(lower)){
+    return 'La clave es inválida. Revísela y péguela de nuevo.';
+  }
+  if(code >= 500 && code < 600){
+    return 'El servicio del Narrador tuvo un problema de su lado. Pruebe de nuevo en un momento.';
+  }
+  return 'No se pudo conectar con el Narrador. Revise su conexión o pruebe de nuevo en un momento.';
+}
+function createHttpError(status, body){
+  const err = new Error(`HTTP ${status}: ${body || 'sin detalle'}`);
+  err.status = status;
+  err.body = body || '';
+  return err;
+}
+function logGroqError(context, err){
+  const status = err?.status ? `status ${err.status}` : 'sin status';
+  const body = err?.body || err?.message || String(err);
+  console.error(`[${context}] ${status} :: ${body}`);
+}
+async function testApiKey(key){
+  const body = {
+    model: GROQ_MODEL,
+    messages:[{role:'user',content:TEST_PROMPT}],
+    temperature:0,
+    max_tokens:16
+  };
+  const res = await fetch(GROQ_ENDPOINT, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${key}` },
+    body: JSON.stringify(body)
+  });
+  if(!res.ok){
+    const txt = await res.text();
+    throw createHttpError(res.status, txt);
+  }
+  return res.json();
+}
+async function groqChat(userText){
+  const apiKey = localStorage.getItem(STORAGE_KEYS.apiKey);
+  if(!apiKey) throw new Error('missing_api_key');
+  const payload = buildGroqPayload(userText);
+  const res = await fetch(GROQ_ENDPOINT, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${apiKey}` },
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok){
+    const txt = await res.text();
+    throw createHttpError(res.status, txt);
+  }
+  const data = await res.json();
+  return data?.choices?.[0]?.message?.content || '';
+}
+function buildGroqPayload(userText){
+  const location = currentLocation();
+  const npcContext = location.npcs.map(n => {
+    const rel = personajeState.relaciones[n.id] || { afinidadGeneral:0, hechosMemorables:[] };
+    return {
+      npcId:n.id,
+      nombre:n.nombre,
+      rol:n.rol,
+      voz:n.voz,
+      afinidadGeneral:rel.afinidadGeneral,
+      hechosMemorables:rel.hechosMemorables.slice(-MAX_MEMORABLE_FACTS)
+    };
+  });
+  const recentConversation = personajeState.chatLog.slice(-MAX_MESSAGE_HISTORY);
+  const relevantLore = buildRelevantLore(
+    personajeState.ubicacion,
+    personajeState.hechosConfirmados.slice(-8),
+    [],
+    recentConversation
+  );
+  const context = {
+    personaje:{
+      nombre:personajeState.personaje.nombre,
+      rasgos:personajeState.personaje.rasgos,
+      estadoSalud:personajeState.personaje.estadoSalud,
+      saludNarrativa:healthNarrative(personajeState.personaje.salud),
+      dinero:personajeState.dinero,
+      ubicacion:personajeState.ubicacion,
+      fechaNarrativa:personajeState.fechaNarrativa,
+      inventario:personajeState.inventario,
+      memoriaNarrativa:personajeState.memoriaNarrativa.slice(-8),
+      hechosConfirmados:personajeState.hechosConfirmados.slice(-8)
+    },
+    mundo:{
+      reyVeridonia: worldChronicle.canonDinamico.reyVeridonia,
+      hechosHistoricos: worldChronicle.hechosHistoricos.slice(-6),
+      canonInventado: worldChronicle.canonInventado || [],
+      vidasAnteriores: worldChronicle.vidasAnteriores.slice(-3),
+      preciosRegionales: worldChronicle.preciosRegionales,
+      ubicacionActual:{ id:location.id, nombre:location.name, descripcion:location.desc, npcs:npcContext },
+      loreRelevanteIds: relevantLore.map(ficha => ficha.id)
+    },
+    ultimaConversacion: recentConversation
+  };
+  return {
+    model:GROQ_MODEL,
+    temperature:0.7,
+    max_tokens:1600,
+    messages:[
+      { role:'system', content: buildSystemPrompt(relevantLore) },
+      { role:'system', content: `ESTADO ACTUAL DEL JUEGO:\n${JSON.stringify(context)}` },
+      { role:'user', content: userText }
+    ]
+  };
+}
+function extractGroqParts(raw){
+  const sceneMatch = raw.match(/\[SCENE:([^\]]+)\]/i);
+  const scene = sceneMatch ? sceneMatch[1].trim().toLowerCase().slice(0,MAX_SCENE_TAG) : SCENE_FALLBACK;
+  const jsonMatch = raw.match(/<STATE_JSON>([\s\S]*?)<\/STATE_JSON>/i);
+  const prose = raw
+    .replace(/<STATE_JSON>[\s\S]*?<\/STATE_JSON>/i,'')
+    .replace(/\[SCENE:[^\]]+\]/ig,'')
+    .trim();
+  if(!jsonMatch) throw new Error('missing_state_json');
+  let parsed;
+  try{ parsed = JSON.parse(jsonMatch[1].trim()); }
+  catch(err){ throw new Error('invalid_state_json'); }
+  return { prose, scene, state: parsed };
+}
+
+function emptyStateProposal(){
+  return {
+    resumenAccion:'', tipoAccion:'ninguna', horasAAvanzar:0,
+    cambiosPersonaje:{ saludDelta:0, dineroDelta:{ bronce:0, plata:0, oro:0, platino:0, monarca:0 }, inventarioAgregar:[], inventarioQuitar:[], ubicacionNueva:null, memoriaNarrativaAgregar:[], muerte:false, causaMuerte:null },
+    cambiosRelaciones:[], hechosConfirmados:[], hechoHistorico:{ tipo:null, descripcion:'', objetivo:null }, solicitudSucesion:{ requiere:false, motivo:null }, opcionesSugeridas:[], npcsMencionados:[], datosInventados:[]
+  };
+}
+function validateProposal(input){
+  const base = emptyStateProposal();
+  const out = Object.assign(base, input || {});
+  const validAction = ['ninguna','dormir','viajar','esperar','leer_extensamente'];
+  if(!validAction.includes(out.tipoAccion)) out.tipoAccion = 'ninguna';
+  out.horasAAvanzar = clamp(Math.round(Number(out.horasAAvanzar||0)), 0, 24*5);
+  const cp = Object.assign(base.cambiosPersonaje, out.cambiosPersonaje || {});
+  cp.saludDelta = clamp(Math.round(Number(cp.saludDelta||0)), -100, 25);
+  cp.dineroDelta = Object.assign(base.cambiosPersonaje.dineroDelta, cp.dineroDelta || {});
+  ['bronce','plata','oro','platino','monarca'].forEach(k => { cp.dineroDelta[k] = clamp(Math.round(Number(cp.dineroDelta[k]||0)), -5000, 5000); });
+  cp.inventarioAgregar = Array.isArray(cp.inventarioAgregar) ? cp.inventarioAgregar.filter(Boolean).slice(0,5) : [];
+  cp.inventarioQuitar = Array.isArray(cp.inventarioQuitar) ? cp.inventarioQuitar.filter(Boolean).slice(0,5) : [];
+  cp.memoriaNarrativaAgregar = Array.isArray(cp.memoriaNarrativaAgregar) ? cp.memoriaNarrativaAgregar.map(String).slice(0,5) : [];
+  cp.muerte = !!cp.muerte;
+  cp.causaMuerte = cp.muerte ? String(cp.causaMuerte || 'La vida se cortó sin ceremonia.') : null;
+  if(cp.ubicacionNueva && !LOCATIONS[cp.ubicacionNueva]) cp.ubicacionNueva = null;
+
+  if(out.tipoAccion === 'dormir') out.horasAAvanzar = 8;
+  if(out.tipoAccion === 'leer_extensamente') out.horasAAvanzar = clamp(out.horasAAvanzar || 3, 2, 4);
+  if(out.tipoAccion === 'esperar') out.horasAAvanzar = clamp(out.horasAAvanzar || 1, 1, 24);
+  if(out.tipoAccion === 'viajar'){
+    const from = personajeState.ubicacion;
+    const to = cp.ubicacionNueva;
+    if(!to || !TRAVEL_HOURS[from]?.[to]){ out.tipoAccion = 'ninguna'; out.horasAAvanzar = 0; cp.ubicacionNueva = null; }
+    else out.horasAAvanzar = TRAVEL_HOURS[from][to];
+  }
+  if(out.tipoAccion === 'ninguna') out.horasAAvanzar = 0;
+
+  out.cambiosRelaciones = Array.isArray(out.cambiosRelaciones) ? out.cambiosRelaciones.slice(0,4).map(r => ({
+    npcId:String(r.npcId||''),
+    afinidadDelta: clamp(Math.round(Number(r.afinidadDelta||0)), -4, 4),
+    hechoMemorable: r.hechoMemorable && r.hechoMemorable.descripcion ? {
+      descripcion:String(r.hechoMemorable.descripcion).slice(0,180),
+      impacto:['positivo','negativo','ambiguo'].includes(r.hechoMemorable.impacto) ? r.hechoMemorable.impacto : 'ambiguo'
+    } : null
+  })).filter(r => !!getNpcMap()[r.npcId]) : [];
+
+  out.hechosConfirmados = Array.isArray(out.hechosConfirmados) ? out.hechosConfirmados.map(String).slice(0,4) : [];
+  out.hechoHistorico = out.hechoHistorico || { tipo:null, descripcion:'', objetivo:null };
+  if(!HISTORICAL_TYPES.includes(out.hechoHistorico.tipo)) out.hechoHistorico.tipo = null;
+  if(!out.hechoHistorico.tipo) out.hechoHistorico = { tipo:null, descripcion:'', objetivo:null };
+  else {
+    out.hechoHistorico.descripcion = String(out.hechoHistorico.descripcion || '').slice(0,220);
+    out.hechoHistorico.objetivo = out.hechoHistorico.objetivo ? String(out.hechoHistorico.objetivo).slice(0,90) : null;
+  }
+
+  out.solicitudSucesion = out.solicitudSucesion || { requiere:false, motivo:null };
+  out.solicitudSucesion.requiere = !!out.solicitudSucesion.requiere && out.hechoHistorico?.tipo === 'muerte_figura_autoridad' && /rey|trono|veridonia/i.test(`${out.solicitudSucesion.motivo||''} ${out.hechoHistorico.descripcion||''} ${out.hechoHistorico.objetivo||''}`);
+  out.solicitudSucesion.motivo = out.solicitudSucesion.requiere ? String(out.solicitudSucesion.motivo || 'Muerte del monarca de Veridonia').slice(0,160) : null;
+
+  out.opcionesSugeridas = Array.isArray(out.opcionesSugeridas) ? out.opcionesSugeridas.map(String).slice(0,4) : [];
+  out.npcsMencionados = Array.isArray(out.npcsMencionados) ? out.npcsMencionados.map(String).slice(0,4) : [];
+  out.datosInventados = Array.isArray(out.datosInventados) ? out.datosInventados.slice(0,8).map(entry => ({
+    tema: String(entry?.tema || '').trim().slice(0,80),
+    dato: String(entry?.dato || '').trim().slice(0,220)
+  })).filter(entry => entry.tema && entry.dato) : [];
+  out.cambiosPersonaje = cp;
+  return out;
+}
+async function maybeGenerateSuccessor(proposal, prose){
+  if(!proposal.solicitudSucesion.requiere) return null;
+  const apiKey = localStorage.getItem(STORAGE_KEYS.apiKey);
+  if(!apiKey) return { nombre:'Aren Elarion', casa:'Elarion', detalle:'Sucesor provisional de la Casa Elarion.' };
+  const prompt = `Necesito solo JSON válido. Según las normas canónicas de la Casa Elarion, si murió el rey de Veridonia, proponga un sucesor coherente, sin inventar magia ni romper el canon. Responda exactamente con:\n{"nombre":"","casa":"Elarion","detalle":""}\nContexto: ${proposal.solicitudSucesion.motivo}. Prosa de la escena: ${prose}`;
+  try{
+    const res = await fetch(GROQ_ENDPOINT, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${apiKey}` },
+      body: JSON.stringify({ model:GROQ_MODEL, temperature:0.2, max_tokens:180, messages:[ {role:'system',content:'Responda solo JSON válido, nada más.'}, {role:'user',content:prompt} ] })
+    });
+    if(!res.ok){
+      const txt = await res.text();
+      throw createHttpError(res.status, txt);
+    }
+    const data = await res.json();
+    const txt = data?.choices?.[0]?.message?.content || '';
+    const j = JSON.parse(txt.match(/\{[\s\S]*\}/)?.[0] || '{}');
+    if(!j.nombre) throw new Error('succession_empty');
+    return { nombre:String(j.nombre).slice(0,80), casa:'Elarion', detalle:String(j.detalle||'Sucesor de la Casa Elarion.').slice(0,180) };
+  }catch(err){
+    logGroqError('succession', err);
+    return { nombre:'Aren Elarion', casa:'Elarion', detalle:'La línea de la Casa Elarion encontró heredero sin ruido público.' };
+  }
+}
+
+async function applyProposal(proposal, prose, scene){
+  ensureRelations();
+  personajeState.chatLog.push({ role:'assistant', content: prose });
+  personajeState.chatLog = personajeState.chatLog.slice(-MAX_MESSAGE_HISTORY);
+
+  personajeState.personaje.salud = clamp(personajeState.personaje.salud + proposal.cambiosPersonaje.saludDelta, 0, 100);
+  personajeState.personaje.estadoSalud = healthDescription(personajeState.personaje.salud);
+  personajeState.dinero = applyMoneyDelta(personajeState.dinero, proposal.cambiosPersonaje.dineroDelta);
+
+  proposal.cambiosPersonaje.inventarioAgregar.forEach(item => {
+    if(!item?.id || !item?.nombre) return;
+    const existing = personajeState.inventario.find(i=>i.id===item.id);
+    if(existing) existing.cantidad += Math.max(1, Number(item.cantidad||1));
+    else personajeState.inventario.push({ id:String(item.id), nombre:String(item.nombre), cantidad:Math.max(1, Number(item.cantidad||1)) });
+  });
+  proposal.cambiosPersonaje.inventarioQuitar.forEach(item => {
+    const found = personajeState.inventario.find(i=>i.id===item.id);
+    if(!found) return;
+    found.cantidad -= Math.max(1, Number(item.cantidad||1));
+  });
+  personajeState.inventario = personajeState.inventario.filter(i=>i.cantidad > 0);
+
+  proposal.cambiosPersonaje.memoriaNarrativaAgregar.forEach(m => {
+    personajeState.memoriaNarrativa.push(m);
+  });
+  personajeState.memoriaNarrativa = personajeState.memoriaNarrativa.slice(-20);
+
+  if(proposal.cambiosPersonaje.ubicacionNueva){ personajeState.ubicacion = proposal.cambiosPersonaje.ubicacionNueva; }
+  if(proposal.horasAAvanzar > 0) advanceTime(proposal.horasAAvanzar);
+
+  proposal.cambiosRelaciones.forEach(rel => {
+    const r = personajeState.relaciones[rel.npcId] || { afinidadGeneral:0, hechosMemorables:[] };
+    r.afinidadGeneral = clamp(r.afinidadGeneral + rel.afinidadDelta, -20, 20);
+    if(rel.hechoMemorable){
+      r.hechosMemorables.push(rel.hechoMemorable);
+      r.hechosMemorables = r.hechosMemorables.slice(-MAX_MEMORABLE_FACTS);
+    }
+    personajeState.relaciones[rel.npcId] = r;
+  });
+
+  proposal.hechosConfirmados.forEach(h => personajeState.hechosConfirmados.push(h));
+  personajeState.hechosConfirmados = personajeState.hechosConfirmados.slice(-16);
+
+  proposal.datosInventados.forEach(entry => {
+    const exists = (worldChronicle.canonInventado || []).some(saved => saved.tema === entry.tema);
+    if(!exists){
+      worldChronicle.canonInventado.push({ tema: entry.tema, dato: entry.dato });
+    }
+  });
+
+  if(proposal.hechoHistorico?.tipo){
+    const fact = {
+      tipo:proposal.hechoHistorico.tipo,
+      descripcion:proposal.hechoHistorico.descripcion,
+      objetivo:proposal.hechoHistorico.objetivo,
+      vidaResponsable: worldChronicle.ultimaVida + 1,
+      fechaNarrativa: formatNarrativeDate(personajeState.fechaNarrativa),
+      sucesorGenerado:null
+    };
+    if(proposal.solicitudSucesion.requiere){
+      const successor = await maybeGenerateSuccessor(proposal, prose);
+      fact.sucesorGenerado = successor;
+      worldChronicle.canonDinamico.reyVeridonia = { nombre:successor.nombre, casa:'Elarion', estado:'vivo', fuente:'worldChronicle' };
+      personajeState.hechosConfirmados.push(`La Corona de Veridonia ya tiene nuevo portador: ${successor.nombre}.`);
+    }
+    worldChronicle.hechosHistoricos.push(fact);
+    worldChronicle.hechosHistoricos = worldChronicle.hechosHistoricos.slice(-24);
+  }
+
+  personajeState.opcionesSugeridas = proposal.opcionesSugeridas.length ? proposal.opcionesSugeridas : buildFallbackQuickActions();
+  personajeState.escenaActual = sanitizeScene(scene);
+  personajeState.ultimaEscenaEtiqueta = personajeState.escenaActual;
+
+  if(proposal.cambiosPersonaje.muerte || personajeState.personaje.salud <= 0){
+    personajeState.vivo = false;
+    handleDeath(proposal.cambiosPersonaje.causaMuerte || 'La vida terminó de golpe.');
+  }
+
+  persistWorld();
+  persistCharacter();
+  updateSceneUI();
+  renderQuickActions();
+}
+function sanitizeScene(scene){
+  const allowed = ['ciudad','mercado','castillo','camino','taberna','bosque','noche','conocimiento','archivo','frontera','puerto'];
+  return allowed.includes(scene) ? scene : SCENE_FALLBACK;
+}
+function formatNarrativeDate(f){ return `${f.day} de ${f.season}, ${f.year} A.A., ${String(f.hour).padStart(2,'0')}:00`; }
+function buildFallbackQuickActions(){
+  const loc = currentLocation();
+  const list = loc?.quick || ['Dormir','Esperar una hora','Preguntar por trabajo'];
+  return list.slice(0,4);
+}
+function handleDeath(cause){
+  const summary = summarizeLife(cause);
+  worldChronicle.ultimaVida += 1;
+  worldChronicle.vidasAnteriores.push(summary);
+  worldChronicle.vidasAnteriores = worldChronicle.vidasAnteriores.slice(-12);
+  persistWorld();
+  localStorage.removeItem(STORAGE_KEYS.character);
+  qs('death-summary').innerHTML = `<p>${escapeHtml(summary.resumen)}</p><p>${escapeHtml(summary.muerte)}</p>`;
+  qs('death-overlay').classList.add('open');
+}
+function summarizeLife(cause){
+  const acts = personajeState.hechosConfirmados.slice(-4);
+  const loc = LOCATIONS[personajeState.ubicacion]?.name || 'Veridonia';
+  return {
+    nombre: personajeState.personaje.nombre,
+    resumen: `${personajeState.personaje.nombre} tuvo una vida corta en ${loc}. ${acts.length ? acts.join(' ') : 'No cambió el reino, pero dejó algunas marcas en la memoria de unos pocos.'}`,
+    actosImportantes: acts,
+    muerte: cause || 'Murió sin testigos.'
+  };
+}
+
+function updateSceneUI(){
+  if(!personajeState) return;
+  const loc = currentLocation();
+  qs('scene-place').textContent = loc.name;
+  qs('scene-meta').textContent = `${currentTimeString()} · ${healthNarrative(personajeState.personaje.salud)}`;
+  qs('scene-label-panel').textContent = `${loc.name} · ${personajeState.escenaActual}`;
+  qs('header-title').textContent = personajeState.personaje.nombre || 'Crónicas de Avaloria';
+  document.body.style.background = sceneBackground(personajeState.escenaActual);
+  requestAnimationFrame(() => {
+    getOpenPanels().forEach(panel => {
+      const anchor = panel.id === 'panel-audio' ? qs('btn-audio-toggle') : qs('btn-save-toggle');
+      positionFloatingPanel(panel, anchor);
+    });
+  });
+}
+function sceneBackground(scene){
+  const map = {
+    ciudad:'radial-gradient(circle at top, rgba(116,101,58,.18), transparent 32%), linear-gradient(180deg, #0d100d, #090b09)',
+    mercado:'radial-gradient(circle at top, rgba(142,91,47,.19), transparent 35%), linear-gradient(180deg, #110f0d, #090909)',
+    camino:'radial-gradient(circle at top, rgba(81,102,66,.18), transparent 35%), linear-gradient(180deg, #0c100d, #080a08)',
+    taberna:'radial-gradient(circle at top, rgba(143,84,47,.2), transparent 34%), linear-gradient(180deg, #130e0c, #090807)',
+    bosque:'radial-gradient(circle at top, rgba(62,101,74,.2), transparent 36%), linear-gradient(180deg, #09100c, #060806)',
+    noche:'radial-gradient(circle at top, rgba(68,77,112,.18), transparent 34%), linear-gradient(180deg, #090b11, #06070a)',
+    conocimiento:'radial-gradient(circle at top, rgba(118,112,72,.18), transparent 34%), linear-gradient(180deg, #10100d, #090908)',
+    archivo:'radial-gradient(circle at top, rgba(106,98,64,.18), transparent 34%), linear-gradient(180deg, #0e0f0d, #080807)',
+    castillo:'radial-gradient(circle at top, rgba(88,108,80,.18), transparent 34%), linear-gradient(180deg, #0c0f0d, #070807)',
+    frontera:'radial-gradient(circle at top, rgba(96,92,72,.18), transparent 34%), linear-gradient(180deg, #100f0d, #080807)',
+    puerto:'radial-gradient(circle at top, rgba(73,109,120,.18), transparent 34%), linear-gradient(180deg, #081014, #06080a)'
+  };
+  return map[scene] || map.ciudad;
+}
+function renderQuickActions(){
+  const wrap = qs('quick-actions');
+  wrap.innerHTML = '';
+  (personajeState?.opcionesSugeridas || buildFallbackQuickActions()).forEach(txt => {
+    const b = document.createElement('button');
+    b.type='button'; b.className='quick-btn'; b.textContent=txt;
+    b.addEventListener('click', ()=>{ qs('input').value = txt; autoResize(); setSendState(); qs('input').focus(); });
+    wrap.appendChild(b);
+  });
+}
+function rebuildChat(){
+  qs('chat').innerHTML='';
+  if(!personajeState?.chatLog?.length){
+    const intro = introNarration();
+    addMessage('narrator', intro, 'narrador');
+    personajeState.chatLog.push({ role:'assistant', content:intro });
+    persistCharacter();
+  }else{
+    personajeState.chatLog.forEach(entry => addMessage(entry.role==='user' ? 'player' : 'narrator', entry.content, entry.role==='user' ? 'Jugador':'narrador'));
+  }
+}
+function introNarration(){
+  const loc = currentLocation();
+  const pastLives = worldChronicle.vidasAnteriores.slice(-2).map(v => v.nombre).filter(Boolean);
+  let echo = '';
+  if(pastLives.length){ echo = ` En el reino todavía se recuerdan otros nombres: ${pastLives.join(', ')}.`; }
+  return `Es de mañana en ${loc.name}. ${loc.desc}${echo}\n\n${personajeState.personaje.nombre} llega con ${formatMoney(personajeState.dinero)} y se siente bien, sin heridas. Nadie lo esperaba, pero puede hacer lo que quiera.`;
+}
+function resetInput(){ qs('input').value=''; autoResize(); setSendState(); }
+function autoResize(){ const el=qs('input'); el.style.height='auto'; el.style.height = Math.min(el.scrollHeight, 124)+'px'; }
+function setSendState(){ qs('send-btn').disabled = runtime.loading || !qs('input').value.trim(); }
+
+async function handleApiConfirm(){
+  const key = qs('api-key-input').value.trim();
+  const error = qs('api-error');
+  error.textContent = '';
+  if(!key){ error.textContent = 'Ingrese una clave para continuar.'; return; }
+  qs('btn-api-confirm').disabled = true;
+  qs('btn-api-confirm').textContent = 'Probando...';
+  try{
+    await testApiKey(key);
+    localStorage.setItem(STORAGE_KEYS.apiKey, key);
+    if(runtime.intendedAction === 'continue' && hasSavedGame()) startContinueFlow();
+    else showScreen('charscreen');
+  }catch(err){
+    logGroqError('testApiKey', err);
+    error.textContent = buildGroqError(err?.body || err?.message || String(err), err?.status);
+  }finally{
+    qs('btn-api-confirm').disabled = false;
+    qs('btn-api-confirm').textContent = 'Confirmar';
+  }
+}
+function startNewFlow(){ runtime.intendedAction='new'; if(!hasApiKey()) showScreen('apiscreen'); else showScreen('charscreen'); }
+function startContinueFlow(){
+  runtime.intendedAction='continue';
+  if(!hasApiKey()) { showScreen('apiscreen'); return; }
+  const ok = localStorage.getItem(STORAGE_KEYS.save) ? loadManual() : !!personajeState;
+  if(!ok && localStorage.getItem(STORAGE_KEYS.character)) personajeState = loadJSON(STORAGE_KEYS.character, null);
+  if(!personajeState){ showScreen('charscreen'); return; }
+  ensureRelations(); openGame();
+}
+function openGame(){
+  showScreen('game');
+  updateSceneUI();
+  rebuildChat();
+  renderQuickActions();
+  renderNarratorNotes();
+  updateSaveMenu();
+  setSaveStatus('cargado','loaded');
+}
+async function handleSend(){
+  const text = qs('input').value.trim();
+  if(!text || runtime.loading || !personajeState?.vivo) return;
+  runtime.loading = true; setSendState(); closePanels();
+  addMessage('player', text, 'Jugador');
+  personajeState.chatLog.push({ role:'user', content:text });
+  personajeState.chatLog = personajeState.chatLog.slice(-MAX_MESSAGE_HISTORY);
+  persistCharacter();
+  resetInput();
+  addTyping();
+  try{
+    const raw = await groqChat(text);
+    const parts = extractGroqParts(raw);
+    const proposal = validateProposal(parts.state);
+    removeTyping();
+    addMessage('narrator', parts.prose, 'narrador');
+    await applyProposal(proposal, parts.prose, parts.scene);
+  }catch(err){
+    removeTyping();
+    logGroqError('handleSend', err);
+    const msg = String(err.message || err);
+    let fiction = 'No se pudo conectar con el Narrador. Revise su conexión o pruebe de nuevo en un momento.';
+    if(/missing_state_json|invalid_state_json/i.test(msg)) fiction = 'La respuesta del Narrador llegó incompleta. Pruebe de nuevo.';
+    else fiction = buildGroqError(err?.body || err?.message || String(err), err?.status);
+    addMessage('narrator', fiction, 'narrador');
+  }finally{
+    runtime.loading = false;
+    setSendState();
+  }
+}
+
+function boot(){
+  updateSaveMenu();
+  renderTraits();
+  renderNarratorNotes();
+  const audioPrefs = loadJSON(STORAGE_KEYS.audio, { mute:false, volume:.5 });
+  runtime.mute = !!audioPrefs.mute; runtime.volume = Number(audioPrefs.volume||.5);
+  qs('vol-slider').value = runtime.volume;
+  qs('pitem-mute').textContent = runtime.mute ? 'Activar' : 'Silenciar';
+
+  qs('btn-start').addEventListener('click', startNewFlow);
+  qs('btn-continue').addEventListener('click', startContinueFlow);
+  qs('btn-back-splash').addEventListener('click', ()=>showScreen('splash'));
+  qs('btn-api-confirm').addEventListener('click', handleApiConfirm);
+  qs('btn-begin-game').addEventListener('click', ()=>{ if(createCharacter()) openGame(); });
+  qs('char-name').addEventListener('keydown', e => { if(e.key === 'Enter') { e.preventDefault(); qs('btn-begin-game').click(); } });
+
+  qs('btn-save-toggle').addEventListener('click', (e)=> {
+    e.stopPropagation();
+    openPanel(qs('panel-save'), qs('btn-save-toggle'));
+  });
+  qs('btn-audio-toggle').addEventListener('click', (e)=> {
+    e.stopPropagation();
+    openPanel(qs('panel-audio'), qs('btn-audio-toggle'));
+  });
+  qs('pitem-save').addEventListener('click', ()=>{ saveManual(); closePanels(); });
+  qs('pitem-load-save').addEventListener('click', ()=>{ if(loadManual()) { closePanels(); openGame(); } });
+  qs('pitem-notes').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    renderNarratorNotes();
+    openPanel(qs('panel-narrator-notes'), qs('btn-save-toggle'));
+  });
+  qs('pitem-delete').addEventListener('click', ()=>{ deleteManual(); closePanels(); });
+  qs('pitem-apikey').addEventListener('click', ()=>{ closePanels(); showScreen('apiscreen'); });
+  qs('pitem-mute').addEventListener('click', ()=>{
+    runtime.mute = !runtime.mute; qs('pitem-mute').textContent = runtime.mute ? 'Activar':'Silenciar';
+    saveJSON(STORAGE_KEYS.audio, { mute:runtime.mute, volume:runtime.volume });
+  });
+  qs('vol-slider').addEventListener('input', e => { runtime.volume = Number(e.target.value); saveJSON(STORAGE_KEYS.audio, { mute:runtime.mute, volume:runtime.volume }); });
+
+  qs('input').addEventListener('input', ()=>{ autoResize(); setSendState(); });
+  qs('input').addEventListener('keydown', e => {
+    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); handleSend(); }
+  });
+  qs('send-btn').addEventListener('click', handleSend);
+  qs('btn-new-life').addEventListener('click', ()=>{
+    qs('death-overlay').classList.remove('open');
+    personajeState = null;
+    localStorage.removeItem(STORAGE_KEYS.character);
+    window.__selectedTraits = [];
+    renderTraits();
+    qs('char-name').value='';
+    showScreen('charscreen');
+  });
+
+  document.addEventListener('click', e => {
+    if(!e.target.closest('.panel') && !e.target.closest('.narrator-notes-panel') && !e.target.closest('.dropdown')) closePanels();
+  });
+
+  window.addEventListener('resize', () => {
+    getOpenPanels().forEach(panel => {
+      const anchor = panel.id === 'panel-audio' ? qs('btn-audio-toggle') : qs('btn-save-toggle');
+      positionFloatingPanel(panel, anchor);
+    });
+  });
+
+  window.addEventListener('popstate', (event) => {
+    if(suppressPopHandler) return;
+    if(handleUiBackNavigation()) return;
+    if(event.state && event.state[UI_HISTORY_TOKEN]){
+      closePanels(true);
+      clearUiHistoryEntry();
+    }
+  });
+
+  if(window.visualViewport){
+    const adjust = ()=>{
+      scrollChat();
+      getOpenPanels().forEach(panel => {
+        const anchor = panel.id === 'panel-audio' ? qs('btn-audio-toggle') : qs('btn-save-toggle');
+        positionFloatingPanel(panel, anchor);
+      });
+    };
+    visualViewport.addEventListener('resize', adjust);
+    visualViewport.addEventListener('scroll', adjust);
+  }
+
+  if(hasSavedGame()) qs('btn-continue').classList.remove('hidden');
+  if(personajeState){
+    ensureRelations();
+  }
+}
+boot();
+</script>
+</body>
+</html>
