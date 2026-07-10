@@ -1,8 +1,9 @@
-{
+
   "name": "Crónicas de Avaloria",
   "short_name": "Avaloria",
   "start_url": ".",
-  "display": "standalone",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
   "background_color": "#0c0f0c",
   "theme_color": "#0c0f0c",
   "icons": [
