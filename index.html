@@ -86,6 +86,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#0c0f0c" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-512.png" />
 <title>Crónicas de Avaloria</title>
 <style>
 :root{
@@ -348,6 +350,78 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
   font-size:.84rem;
   line-height:1.8;
 }
+.modal-overlay{
+  display:none;
+  position:absolute;
+  inset:0;
+  z-index:95;
+  background:rgba(6,8,6,.72);
+  padding:calc(var(--safe-top) + 16px) 16px calc(var(--safe-bottom) + 16px);
+  align-items:center;
+  justify-content:center;
+}
+.modal-overlay.open{display:flex}
+.modal-window{
+  position:relative;
+  width:min(100%, 360px);
+  max-height:100%;
+  overflow:auto;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(17,22,18,.94), rgba(10,13,10,.98));
+  box-shadow:var(--shadow);
+  padding:22px 16px 18px;
+}
+.modal-close{
+  position:absolute;
+  top:8px;
+  right:8px;
+  min-width:36px;
+  min-height:36px;
+  border:none;
+  background:transparent;
+  color:var(--ink-soft);
+  font-size:1rem;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.modal-title{
+  font-family:var(--font-story);
+  font-size:1.4rem;
+  line-height:1.2;
+  color:var(--gold);
+  margin-bottom:18px;
+}
+.modal-copy{
+  color:var(--ink-soft);
+  font-size:.84rem;
+  line-height:1.8;
+}
+.modal-section + .modal-section{
+  margin-top:24px;
+  padding-top:24px;
+  border-top:1px solid rgba(255,255,255,.05);
+}
+.modal-section-title{
+  font-size:.66rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  margin-bottom:12px;
+}
+.modal-actions{
+  margin-top:16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.modal-note{
+  margin-top:10px;
+  color:var(--ink-faint);
+  font-size:.72rem;
+  line-height:1.75;
+}
 #scene-banner{
   flex-shrink:0;
   border-bottom:1px solid var(--line);
@@ -448,6 +522,7 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
     <div class="stack-cta">
       <button class="btn" id="btn-start">Comenzar</button>
       <button class="btn secondary hidden" id="btn-continue">Continuar partida guardada</button>
+      <button class="btn secondary" id="btn-open-settings">⚙️ Configuración</button>
     </div>
   </section>
 
@@ -458,7 +533,7 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
       <p class="panel-copy">Para despertar al Narrador necesita una clave de Groq. Hágalo así: entre a <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">console.groq.com/keys</a>, cree su cuenta, genere una API key y péguela acá.</p>
       <div class="field">
         <label class="label" for="api-key-input">Clave API</label>
-        <input class="input" id="api-key-input" type="password" placeholder="gsk_..." autocomplete="off" />
+        <input class="input" id="api-key-input" type="text" placeholder="gsk_..." autocomplete="off" />
         <div class="error" id="api-error"></div>
       </div>
       <button class="btn" id="btn-api-confirm" style="margin-top:18px;max-width:none">Confirmar</button>
@@ -492,6 +567,9 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
       <span class="hdot"></span>
       <div class="header-right">
         <span class="save-status" id="save-status"></span>
+        <div class="dropdown">
+          <button class="icon-btn" id="btn-home-toggle" aria-label="Volver al menú principal" aria-expanded="false">🏠</button>
+        </div>
         <div class="dropdown">
           <button class="icon-btn" id="btn-save-toggle" aria-label="Menú de guardado" aria-expanded="false">💾</button>
           <div class="panel" id="panel-save">
@@ -531,6 +609,42 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
       <button id="send-btn" disabled>↵</button>
     </div>
   </section>
+
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal-window">
+      <button class="modal-close" id="btn-settings-close" aria-label="Cerrar">✕</button>
+      <h2 class="modal-title">Configuración</h2>
+      <div class="modal-section">
+        <div class="modal-section-title">Clave API</div>
+        <div class="modal-copy">La clave guardada se muestra en texto plano para que pueda leerla y copiarla directo.</div>
+        <div class="field">
+          <label class="label" for="settings-api-input">Clave actual</label>
+          <input class="input" id="settings-api-input" type="text" placeholder="gsk_..." autocomplete="off" />
+          <div class="error" id="settings-api-error"></div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn" id="btn-settings-save-api">Guardar clave</button>
+        </div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-title">Sonido</div>
+        <button class="pitem" id="settings-pitem-mute">Silenciar</button>
+        <div class="vol-row"><span class="vol-label">VOL</span><input id="settings-vol-slider" type="range" min="0" max="1" step="0.05" value="0.5" /></div>
+        <div class="modal-note">Usa el mismo estado global de audio del juego.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="home-modal">
+    <div class="modal-window">
+      <button class="modal-close" id="btn-home-close" aria-label="Cerrar">✕</button>
+      <h2 class="modal-title">Volver al menú</h2>
+      <div class="modal-copy">Saldrás al menú principal. Tu progreso será guardado.</div>
+      <div class="modal-actions">
+        <button class="btn" id="btn-home-confirm">Continuar</button>
+      </div>
+    </div>
+  </div>
 
   <div id="death-overlay">
     <div class="death-box">
@@ -988,6 +1102,7 @@ let runtime = {
 const UI_HISTORY_TOKEN = '__avaloria_ui_layer__';
 let uiHistoryDepth = 0;
 let suppressPopHandler = false;
+let activeModal = null;
 
 function qs(id){ return document.getElementById(id); }
 function loadJSON(key, fallback){
@@ -1112,8 +1227,17 @@ function updateSaveMenu(){
   qs('pitem-load-save').style.display = has ? 'block':'none';
   qs('pitem-delete').style.display = has ? 'block':'none';
 }
-function getOpenPanels(){
-  return Array.from(document.querySelectorAll('.panel.open, .narrator-notes-panel.open'));
+function syncAudioUI(){
+  qs('vol-slider').value = runtime.volume;
+  qs('settings-vol-slider').value = runtime.volume;
+  const label = runtime.mute ? 'Activar' : 'Silenciar';
+  qs('pitem-mute').textContent = label;
+  qs('settings-pitem-mute').textContent = label;
+}
+function loadStoredApiKeyIntoUI(){
+  const key = localStorage.getItem(STORAGE_KEYS.apiKey) || '';
+  qs('api-key-input').value = key;
+  qs('settings-api-input').value = key;
 }
 function clearUiHistoryEntry(){
   if(uiHistoryDepth > 0){
@@ -1126,7 +1250,7 @@ function clearUiHistoryEntry(){
   }
 }
 function syncUiHistory(){
-  const hasOpen = getOpenPanels().length > 0;
+  const hasOpen = document.querySelector('.panel.open, .narrator-notes-panel.open, .modal-overlay.open');
   if(hasOpen && uiHistoryDepth === 0){
     uiHistoryDepth = 1;
     history.pushState({ [UI_HISTORY_TOKEN]: true }, '', location.href);
@@ -1141,7 +1265,23 @@ function closePanels(skipHistorySync=false){
   });
   qs('btn-save-toggle').setAttribute('aria-expanded','false');
   qs('btn-audio-toggle').setAttribute('aria-expanded','false');
-  if(!skipHistorySync) clearUiHistoryEntry();
+  if(!skipHistorySync && !activeModal) clearUiHistoryEntry();
+}
+function closeModal(modalId, skipHistorySync=false){
+  const modal = qs(modalId);
+  if(!modal) return;
+  modal.classList.remove('open');
+  if(activeModal === modalId) activeModal = null;
+  if(!skipHistorySync && !document.querySelector('.panel.open, .narrator-notes-panel.open, .modal-overlay.open')) clearUiHistoryEntry();
+}
+function openModal(modalId){
+  closePanels(true);
+  document.querySelectorAll('.modal-overlay').forEach(modal => modal.classList.remove('open'));
+  const modal = qs(modalId);
+  if(!modal) return;
+  modal.classList.add('open');
+  activeModal = modalId;
+  syncUiHistory();
 }
 function positionFloatingPanel(panel, anchor){
   if(!panel || !anchor) return;
@@ -1171,6 +1311,7 @@ function openPanel(panel, anchor){
     closePanels();
     return;
   }
+  if(activeModal) return;
   closePanels(true);
   panel.classList.add('open');
   positionFloatingPanel(panel, anchor);
@@ -1180,7 +1321,13 @@ function openPanel(panel, anchor){
   syncUiHistory();
 }
 function handleUiBackNavigation(){
-  if(getOpenPanels().length){
+  if(activeModal){
+    if(activeModal === 'settings-modal') closeModal('settings-modal', true);
+    else if(activeModal === 'home-modal') closeModal('home-modal', true);
+    clearUiHistoryEntry();
+    return true;
+  }
+  if(document.querySelector('.panel.open, .narrator-notes-panel.open')){
     closePanels(true);
     clearUiHistoryEntry();
     return true;
@@ -1616,7 +1763,7 @@ function updateSceneUI(){
   qs('header-title').textContent = personajeState.personaje.nombre || 'Crónicas de Avaloria';
   document.body.style.background = sceneBackground(personajeState.escenaActual);
   requestAnimationFrame(() => {
-    getOpenPanels().forEach(panel => {
+    document.querySelectorAll('.panel.open, .narrator-notes-panel.open').forEach(panel => {
       const anchor = panel.id === 'panel-audio' ? qs('btn-audio-toggle') : qs('btn-save-toggle');
       positionFloatingPanel(panel, anchor);
     });
@@ -1680,6 +1827,7 @@ async function handleApiConfirm(){
   try{
     await testApiKey(key);
     localStorage.setItem(STORAGE_KEYS.apiKey, key);
+    loadStoredApiKeyIntoUI();
     if(runtime.intendedAction === 'continue' && hasSavedGame()) startContinueFlow();
     else showScreen('charscreen');
   }catch(err){
@@ -1688,6 +1836,29 @@ async function handleApiConfirm(){
   }finally{
     qs('btn-api-confirm').disabled = false;
     qs('btn-api-confirm').textContent = 'Confirmar';
+  }
+}
+async function saveApiKeyFromSettings(){
+  const key = qs('settings-api-input').value.trim();
+  const error = qs('settings-api-error');
+  error.textContent = '';
+  if(!key){
+    error.textContent = 'Ingrese una clave para guardar.';
+    return;
+  }
+  qs('btn-settings-save-api').disabled = true;
+  qs('btn-settings-save-api').textContent = 'Probando...';
+  try{
+    await testApiKey(key);
+    localStorage.setItem(STORAGE_KEYS.apiKey, key);
+    loadStoredApiKeyIntoUI();
+    error.textContent = 'Clave guardada.';
+  }catch(err){
+    logGroqError('settingsApi', err);
+    error.textContent = buildGroqError(err?.body || err?.message || String(err), err?.status);
+  }finally{
+    qs('btn-settings-save-api').disabled = false;
+    qs('btn-settings-save-api').textContent = 'Guardar clave';
   }
 }
 function startNewFlow(){ runtime.intendedAction='new'; if(!hasApiKey()) showScreen('apiscreen'); else showScreen('charscreen'); }
@@ -1745,15 +1916,35 @@ function boot(){
   renderNarratorNotes();
   const audioPrefs = loadJSON(STORAGE_KEYS.audio, { mute:false, volume:.5 });
   runtime.mute = !!audioPrefs.mute; runtime.volume = Number(audioPrefs.volume||.5);
-  qs('vol-slider').value = runtime.volume;
-  qs('pitem-mute').textContent = runtime.mute ? 'Activar' : 'Silenciar';
+  syncAudioUI();
+  loadStoredApiKeyIntoUI();
 
   qs('btn-start').addEventListener('click', startNewFlow);
   qs('btn-continue').addEventListener('click', startContinueFlow);
+  qs('btn-open-settings').addEventListener('click', ()=>{
+    loadStoredApiKeyIntoUI();
+    syncAudioUI();
+    qs('settings-api-error').textContent = '';
+    openModal('settings-modal');
+  });
+  qs('btn-settings-close').addEventListener('click', ()=> closeModal('settings-modal'));
+  qs('btn-settings-save-api').addEventListener('click', saveApiKeyFromSettings);
   qs('btn-back-splash').addEventListener('click', ()=>showScreen('splash'));
   qs('btn-api-confirm').addEventListener('click', handleApiConfirm);
   qs('btn-begin-game').addEventListener('click', ()=>{ if(createCharacter()) openGame(); });
   qs('char-name').addEventListener('keydown', e => { if(e.key === 'Enter') { e.preventDefault(); qs('btn-begin-game').click(); } });
+
+  qs('btn-home-toggle').addEventListener('click', (e)=> {
+    e.stopPropagation();
+    openModal('home-modal');
+  });
+  qs('btn-home-close').addEventListener('click', ()=> closeModal('home-modal'));
+  qs('btn-home-confirm').addEventListener('click', ()=>{
+    saveManual();
+    closeModal('home-modal');
+    showScreen('splash');
+    updateSaveMenu();
+  });
 
   qs('btn-save-toggle').addEventListener('click', (e)=> {
     e.stopPropagation();
@@ -1773,10 +1964,25 @@ function boot(){
   qs('pitem-delete').addEventListener('click', ()=>{ deleteManual(); closePanels(); });
   qs('pitem-apikey').addEventListener('click', ()=>{ closePanels(); showScreen('apiscreen'); });
   qs('pitem-mute').addEventListener('click', ()=>{
-    runtime.mute = !runtime.mute; qs('pitem-mute').textContent = runtime.mute ? 'Activar':'Silenciar';
+    runtime.mute = !runtime.mute;
     saveJSON(STORAGE_KEYS.audio, { mute:runtime.mute, volume:runtime.volume });
+    syncAudioUI();
   });
-  qs('vol-slider').addEventListener('input', e => { runtime.volume = Number(e.target.value); saveJSON(STORAGE_KEYS.audio, { mute:runtime.mute, volume:runtime.volume }); });
+  qs('settings-pitem-mute').addEventListener('click', ()=>{
+    runtime.mute = !runtime.mute;
+    saveJSON(STORAGE_KEYS.audio, { mute:runtime.mute, volume:runtime.volume });
+    syncAudioUI();
+  });
+  qs('vol-slider').addEventListener('input', e => {
+    runtime.volume = Number(e.target.value);
+    saveJSON(STORAGE_KEYS.audio, { mute:runtime.mute, volume:runtime.volume });
+    syncAudioUI();
+  });
+  qs('settings-vol-slider').addEventListener('input', e => {
+    runtime.volume = Number(e.target.value);
+    saveJSON(STORAGE_KEYS.audio, { mute:runtime.mute, volume:runtime.volume });
+    syncAudioUI();
+  });
 
   qs('input').addEventListener('input', ()=>{ autoResize(); setSendState(); });
   qs('input').addEventListener('keydown', e => {
@@ -1793,12 +1999,8 @@ function boot(){
     showScreen('charscreen');
   });
 
-  document.addEventListener('click', e => {
-    if(!e.target.closest('.panel') && !e.target.closest('.narrator-notes-panel') && !e.target.closest('.dropdown')) closePanels();
-  });
-
   window.addEventListener('resize', () => {
-    getOpenPanels().forEach(panel => {
+    document.querySelectorAll('.panel.open, .narrator-notes-panel.open').forEach(panel => {
       const anchor = panel.id === 'panel-audio' ? qs('btn-audio-toggle') : qs('btn-save-toggle');
       positionFloatingPanel(panel, anchor);
     });
@@ -1808,7 +2010,8 @@ function boot(){
     if(suppressPopHandler) return;
     if(handleUiBackNavigation()) return;
     if(event.state && event.state[UI_HISTORY_TOKEN]){
-      closePanels(true);
+      if(activeModal) closeModal(activeModal, true);
+      else closePanels(true);
       clearUiHistoryEntry();
     }
   });
@@ -1816,7 +2019,7 @@ function boot(){
   if(window.visualViewport){
     const adjust = ()=>{
       scrollChat();
-      getOpenPanels().forEach(panel => {
+      document.querySelectorAll('.panel.open, .narrator-notes-panel.open').forEach(panel => {
         const anchor = panel.id === 'panel-audio' ? qs('btn-audio-toggle') : qs('btn-save-toggle');
         positionFloatingPanel(panel, anchor);
       });
@@ -1828,6 +2031,12 @@ function boot(){
   if(hasSavedGame()) qs('btn-continue').classList.remove('hidden');
   if(personajeState){
     ensureRelations();
+  }
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
   }
 }
 boot();
