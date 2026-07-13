@@ -88,6 +88,10 @@
 <meta name="theme-color" content="#0c0f0c" />
 <link rel="manifest" href="manifest.json" />
 <link rel="apple-touch-icon" href="icon-512.png" />
+<!-- Ronda 4A: tipografías para el sistema visual (Cinzel/Cormorant Garamond). Fallback serif del sistema definido en CSS por si no hay conexión. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 <title>Crónicas de Avaloria</title>
 <style>
 :root{
@@ -169,15 +173,19 @@ button,input,textarea,.trait,.quick-btn,.pitem,.icon-btn,.btn{touch-action:manip
 .trait-tag{font-size:.64rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-dim);line-height:1.5}
 .trait-copy{margin-top:6px;font-family:var(--font-story);font-size:.85rem;line-height:1.45;color:var(--ink-soft)}
 #game{flex-direction:column;overflow:hidden;min-height:0}
-#header{flex-shrink:0;display:flex;align-items:center;gap:8px;min-height:calc(56px + var(--safe-top));padding:calc(var(--safe-top) + 8px) 12px 8px;border-bottom:1px solid var(--line);background:linear-gradient(180deg, rgba(11,14,11,.96), rgba(13,18,14,.9))}
-.hdot{width:4px;height:4px;border-radius:50%;background:var(--gold-dim);flex:0 0 auto}
-.htitle{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:34vw}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:2px;position:relative}
-.save-status{font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);min-width:54px;text-align:right}
+#header{flex-shrink:0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;min-height:calc(56px + var(--safe-top));padding:calc(var(--safe-top) + 8px) 12px 8px;border-bottom:1px solid var(--line);background:linear-gradient(180deg, rgba(11,14,11,.96), rgba(13,18,14,.9))}
+.header-left{display:flex;align-items:center;gap:8px;min-width:0;justify-self:start}
+.header-emblem{width:22px;height:22px;flex:0 0 auto;border-radius:50%;border:1px solid var(--frame-highlight);background:rgba(199,150,67,.08);display:flex;align-items:center;justify-content:center;padding:4px}
+.header-emblem svg{width:100%;height:100%;display:block}
+.htitle{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:28vw}
+.header-right{display:flex;align-items:center;gap:2px;position:relative;justify-self:end}
+.save-status{font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);text-align:center;justify-self:center}
 .save-status.saved{color:var(--ok)}
 .save-status.loaded{color:var(--gold-dim)}
 .save-status.error{color:var(--danger)}
 .icon-btn{min-width:48px;min-height:48px;border:none;background:transparent;color:var(--gold);font-size:1.05rem;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.icon-btn .btn-icon{width:19px;height:19px;display:flex;align-items:center;justify-content:center}
+.icon-btn .btn-icon svg{width:100%;height:100%;display:block}
 .icon-btn:active{opacity:.6}
 .dropdown{position:relative}
 .panel{display:none;position:fixed;top:0;left:0;min-width:220px;max-width:min(280px, calc(100vw - 16px));border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);z-index:50}
@@ -211,7 +219,9 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
 #scene-banner{flex-shrink:0;border-bottom:1px solid var(--line);padding:12px 12px;background:linear-gradient(90deg, rgba(76,95,63,.16), rgba(102,77,44,.09))}
 .scene-row{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
 .scene-place{font-family:var(--font-story);font-size:1.14rem;color:var(--ink);line-height:1.3}
-.scene-meta{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);line-height:1.6;text-align:right;max-width:48%}
+.scene-info{display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right;max-width:48%}
+.scene-meta{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);line-height:1.4}
+.scene-health{font-size:.72rem;letter-spacing:0;text-transform:none;font-family:var(--font-narrative);color:var(--ink-faint);line-height:1.4}
 #chat{flex:1;overflow-y:auto;overflow-x:hidden;min-height:0;padding:18px 12px 8px;display:flex;flex-direction:column;gap:18px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .msg{animation:fadeIn .32s var(--ease)}
 .msg-narrator .meta{font-size:.58rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:10px}
@@ -220,6 +230,7 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
 .story{font-family:var(--font-story);font-size:clamp(1rem,4.7vw,1.08rem);line-height:1.82;color:var(--ink);text-wrap:pretty}
 .story p{margin:0 0 12px}
 .story p:last-child{margin-bottom:0}
+.story-p-in{animation:fadeIn .5s var(--ease)}
 .player-text{font-size:.95rem;line-height:1.58;font-style:italic;color:var(--player)}
 .system-chip{align-self:flex-start;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);padding:10px 12px;border:1px solid var(--line);background:rgba(255,255,255,.02);min-height:40px;display:flex;align-items:center}
 .typing{display:flex;gap:6px;padding:2px 0 8px;min-height:24px;align-items:center}
@@ -229,7 +240,7 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
 #quick-actions::-webkit-scrollbar{display:none}
 .quick-btn{border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--ink-soft);min-height:48px;padding:12px 14px;white-space:nowrap;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
 .quick-btn:active{border-color:var(--gold);color:var(--gold)}
-#input-wrap{flex-shrink:0;display:flex;align-items:flex-end;border-top:1px solid var(--line);background:linear-gradient(180deg, rgba(10,13,10,.98), rgba(11,14,11,.96));padding-bottom:var(--safe-bottom)}
+#input-wrap{flex-shrink:0;display:flex;align-items:flex-end;border-top:1px solid var(--line);background:linear-gradient(180deg, rgba(10,13,10,.98), rgba(11,14,11,.96))}
 #input{flex:1;border:none;background:transparent;min-height:56px;max-height:124px;padding:14px 12px 16px;font-size:16px;line-height:1.5;resize:none;outline:none;color:var(--ink)}
 #input::placeholder{color:var(--ink-faint)}
 #send-btn{flex-shrink:0;min-width:56px;min-height:56px;align-self:stretch;border:none;border-left:1px solid var(--line);background:transparent;color:var(--gold);font-size:1.35rem;cursor:pointer}
@@ -251,7 +262,7 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
   .panel-title{font-size:1.42rem}
   .panel-box{padding:22px 14px}
   .scene-row{align-items:flex-start;flex-direction:column;gap:6px}
-  .scene-meta{max-width:none;text-align:left}
+  .scene-info{max-width:none;text-align:left;align-items:flex-start}
   .htitle{max-width:28vw}
   .save-status{display:none}
 }
@@ -281,22 +292,243 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
   #charscreen .panel-copy{display:none}
   #charscreen .trait-copy{font-size:.76rem}
 }
+
+/* ============================================================
+   Ronda 4A — Sistema visual (piezas reutilizables)
+   Nada de esta sección se aplica todavía a pantallas existentes.
+   Eso queda para las Rondas 4B (splash) y 4C (juego).
+   ============================================================ */
+
+:root{
+  /* Cinzel para títulos grandes, Cormorant Garamond para cuerpo narrativo
+     y subtítulos en cursiva. El fallback "serif" cubre el caso de que el
+     archivo se abra local sin conexión y Google Fonts no cargue. */
+  --font-display: 'Cinzel', serif;
+  --font-narrative: 'Cormorant Garamond', serif;
+
+  /* Paleta del marco ornamental */
+  --frame-border: #4C3A20;
+  --frame-highlight: #C79643;
+}
+
+/* Marco fino color bronce que rodea el contenido de una pantalla completa. */
+.ornate-frame{
+  position:relative;
+  border:1px solid var(--frame-border);
+  box-shadow:inset 0 0 0 1px var(--frame-highlight), inset 0 0 18px rgba(76,58,32,.28);
+}
+
+/* Adornos de esquina tipo "esquina de manuscrito": dos líneas diagonales
+   cortas. Se define una sola vez como imagen de fondo y se reutiliza en
+   las 4 esquinas invirtiéndola por CSS (sin redibujar por esquina). */
+.corner-ornament{
+  position:absolute;
+  width:18px;
+  height:18px;
+  pointer-events:none;
+  background-repeat:no-repeat;
+  background-size:contain;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M2 12L12 2M2 6L6 2' stroke='%23C79643' stroke-width='1.3' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+}
+.corner-ornament--tl{top:0;left:0}
+.corner-ornament--tr{top:0;right:0;transform:scaleX(-1)}
+.corner-ornament--bl{bottom:0;left:0;transform:scaleY(-1)}
+.corner-ornament--br{bottom:0;right:0;transform:scale(-1,-1)}
+
+/* Separador horizontal decorativo con rombo central, para usar entre
+   secciones de texto dentro de una pantalla. */
+.ornamental-divider{
+  position:relative;
+  height:1px;
+  width:70%;
+  margin:24px auto;
+  background:var(--frame-highlight);
+  opacity:.55;
+}
+.ornamental-divider::before{
+  content:'';
+  position:absolute;
+  top:50%;left:50%;
+  width:8px;height:8px;
+  background:var(--bg);
+  border:1.3px solid var(--frame-highlight);
+  transform:translate(-50%,-50%) rotate(45deg);
+}
+
+/* ============================================================
+   Ronda 4B — Aplicación del sistema visual 4A al splash.
+   Todo lo de acá está scopeado a #splash para no tocar apiscreen,
+   charscreen ni la pantalla de juego.
+   ============================================================ */
+
+.splash-frame{
+  position:relative;
+  z-index:1;
+  width:100%;
+  padding:30px 20px 22px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.splash-crown{
+  width:30px;
+  height:30px;
+  margin:0 auto 14px;
+  opacity:.92;
+}
+.splash-crown svg{width:100%;height:100%;display:block}
+#splash .eyebrow{font-family:var(--font-display)}
+#splash .ornamental-divider{margin:18px auto}
+#splash .title{
+  font-family:var(--font-display);
+  font-weight:700;
+  color:#D7AE64;
+  text-shadow:0 1px 1px rgba(0,0,0,.5), 0 0 20px rgba(215,174,100,.16);
+}
+#splash .subtitle{font-family:var(--font-narrative)}
+#splash .subtle{font-family:var(--font-display)}
+#splash .stack-cta{width:100%}
+
+/* Botones "cartel": marco fino con esquinas cortadas (mismo lenguaje
+   visual que el recorte tipo "ticket"), ícono a la izquierda, flecha
+   a la derecha. El clip-path recorta también el border, por eso el
+   corte de esquina se ve limpio sin necesitar SVG aparte. */
+.btn-ticket{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  clip-path:polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  transition:background-color .18s var(--ease), border-color .18s var(--ease), color .18s var(--ease), transform .18s var(--ease), box-shadow .18s var(--ease);
+}
+.btn-ticket .btn-icon{
+  flex:0 0 auto;
+  width:18px;
+  height:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:.92;
+}
+.btn-ticket .btn-icon svg{width:100%;height:100%;display:block}
+.btn-ticket .btn-label{flex:1;text-align:left}
+.btn-ticket .btn-arrow{flex:0 0 auto;font-size:.9rem;opacity:.75}
+.btn-ticket:hover{box-shadow:0 0 0 1px var(--frame-highlight), 0 0 14px rgba(199,150,67,.28)}
+.btn-ticket:active{box-shadow:0 0 0 1px var(--frame-highlight), 0 0 14px rgba(199,150,67,.4)}
+
+.splash-footer{
+  width:100%;
+  margin-top:auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.splash-footer .ornamental-divider{margin:18px auto 12px}
+.splash-emblem{width:26px;height:26px;opacity:.85}
+.splash-emblem svg{width:100%;height:100%;display:block}
+
+@media (max-height:900px){
+  .splash-frame{padding:20px 16px 16px}
+  .splash-crown{width:24px;height:24px;margin-bottom:10px}
+  #splash .ornamental-divider{margin:12px auto}
+  .splash-footer .ornamental-divider{margin:12px auto 10px}
+}
+@media (max-height:800px){
+  .splash-frame{padding:14px 14px 12px}
+  .splash-crown{width:20px;height:20px;margin-bottom:8px}
+  #splash .ornamental-divider{margin:8px auto}
+  .splash-footer .ornamental-divider{margin:8px auto 8px}
+  .splash-emblem{width:22px;height:22px}
+}
+
+/* ============================================================
+   Ronda 4C — Aplicación del sistema visual 4A al gameplay.
+   Todo lo de acá está scopeado a #game (header, scene-banner,
+   #chat, input, footer) para no tocar splash ni charscreen.
+   ============================================================ */
+
+.scene-divider.ornamental-divider{margin:0 auto;width:88%}
+#game .ornamental-divider{margin:8px auto}
+
+/* Caja de narración: fondo levemente más claro que el fondo general,
+   borde fino bronce, alto automático según contenido. */
+.msg-narrator{
+  background:var(--surface);
+  border:1px solid rgba(199,150,67,.4);
+  padding:14px 14px 12px;
+}
+.msg-narrator .meta{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:12px;
+}
+.msg-narrator .meta-line{flex:1;height:1px;background:var(--frame-highlight);opacity:.4}
+.msg-narrator .meta-text{flex:0 0 auto;white-space:nowrap}
+.story{
+  font-family:var(--font-narrative);
+  font-size:clamp(1.35rem, 4.5vw, 1.875rem);
+  line-height:1.7;
+}
+
+/* Input: mismas esquinas cortadas tipo "ticket" que el resto del
+   rediseño, con brillo sutil al enfocar el campo de texto. */
+#input-wrap{
+  border-top:1px solid rgba(199,150,67,.35);
+  clip-path:polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
+  transition:box-shadow .18s var(--ease);
+}
+#input-wrap:focus-within{box-shadow:inset 0 0 0 1px var(--frame-highlight), 0 0 14px rgba(199,150,67,.22)}
+#send-btn{display:flex;align-items:center;justify-content:center}
+#send-btn .btn-icon{width:20px;height:20px;display:flex;align-items:center;justify-content:center}
+#send-btn .btn-icon svg{width:100%;height:100%;display:block}
+
+.game-footer{flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:6px 12px calc(var(--safe-bottom) + 6px)}
+.game-footer .ornamental-divider{margin:6px auto}
+
+@media (max-height:900px){
+  .msg-narrator{padding:12px 12px 10px}
+  .msg-narrator .meta{margin-bottom:9px}
+  .story{font-size:clamp(1.2rem, 4.5vw, 1.7rem);line-height:1.6}
+  .game-footer{padding:4px 12px calc(var(--safe-bottom) + 4px)}
+  .game-footer .ornamental-divider{margin:4px auto}
+  .splash-emblem{width:22px;height:22px}
+}
+@media (max-height:800px){
+  .msg-narrator{padding:10px 10px 9px}
+  .story{font-size:clamp(1.1rem, 4.5vw, 1.5rem);line-height:1.55}
+  #scene-banner{padding:9px 12px}
+  .game-footer{padding:3px 12px calc(var(--safe-bottom) + 3px)}
+  .game-footer .splash-emblem{width:18px;height:18px}
+}
 </style>
 </head>
 <body>
 <div id="app">
   <section id="splash" class="screen active frame-lines">
     <div class="orb"></div>
-    <div class="center-copy">
-      <div class="eyebrow">archivo real de ardenhall</div>
-      <h1 class="title">CRÓNICAS<br>DE AVALORIA</h1>
-      <p class="subtitle">No gobierna el mundo.<br>Vive dentro de él.</p>
-      <p class="subtle">Veridonia, año 763 del calendario avaloriano</p>
-    </div>
-    <div class="stack-cta">
-      <button class="btn" id="btn-start">Comenzar</button>
-      <button class="btn secondary hidden" id="btn-continue">Continuar partida guardada</button>
-      <button class="btn secondary" id="btn-open-settings">Configuración</button>
+    <div class="ornate-frame splash-frame">
+      <span class="corner-ornament corner-ornament--tl"></span>
+      <span class="corner-ornament corner-ornament--tr"></span>
+      <span class="corner-ornament corner-ornament--bl"></span>
+      <span class="corner-ornament corner-ornament--br"></span>
+      <div class="center-copy">
+        <div class="splash-crown" id="splash-crown" aria-hidden="true"></div>
+        <div class="eyebrow">archivo real de ardenhall</div>
+        <div class="ornamental-divider"></div>
+        <h1 class="title">CRÓNICAS<br>DE AVALORIA</h1>
+        <p class="subtitle">No gobierna el mundo.<br>Vive dentro de él.</p>
+        <div class="ornamental-divider"></div>
+        <p class="subtle">Veridonia, año 763 del calendario avaloriano</p>
+      </div>
+      <div class="stack-cta">
+        <button class="btn btn-ticket" id="btn-start"><span class="btn-icon" data-icon="sword"></span><span class="btn-label">Comenzar</span><span class="btn-arrow">›</span></button>
+        <button class="btn btn-ticket secondary hidden" id="btn-continue"><span class="btn-icon" data-icon="floppy"></span><span class="btn-label">Continuar partida guardada</span><span class="btn-arrow">›</span></button>
+        <button class="btn btn-ticket secondary" id="btn-open-settings"><span class="btn-icon" data-icon="gear"></span><span class="btn-label">Configuración</span><span class="btn-arrow">›</span></button>
+      </div>
+      <div class="splash-footer">
+        <div class="ornamental-divider"></div>
+        <div class="splash-emblem" id="splash-emblem" aria-hidden="true"></div>
+      </div>
     </div>
     <div class="splash-version" id="splash-version"></div>
   </section>
@@ -337,16 +569,17 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
 
   <section id="game" class="screen">
     <header id="header">
-      <span class="hdot"></span>
-      <span class="htitle" id="header-title">CRÓNICAS DE AVALORIA</span>
-      <span class="hdot"></span>
+      <div class="header-left">
+        <span class="header-emblem" id="header-emblem" aria-hidden="true"></span>
+        <span class="htitle" id="header-title">CRÓNICAS DE AVALORIA</span>
+      </div>
+      <span class="save-status" id="save-status"></span>
       <div class="header-right">
-        <span class="save-status" id="save-status"></span>
         <div class="dropdown">
-          <button class="icon-btn" id="btn-home-toggle" aria-label="Volver al menú principal" aria-expanded="false">🏠</button>
+          <button class="icon-btn" id="btn-home-toggle" aria-label="Volver al menú principal" aria-expanded="false"><span class="btn-icon" data-icon="castle"></span></button>
         </div>
         <div class="dropdown">
-          <button class="icon-btn" id="btn-save-toggle" aria-label="Menú de guardado" aria-expanded="false">💾</button>
+          <button class="icon-btn" id="btn-save-toggle" aria-label="Menú de guardado" aria-expanded="false"><span class="btn-icon" data-icon="floppy"></span></button>
           <div class="panel" id="panel-save">
             <button class="pitem" id="pitem-save">Guardar partida</button>
             <button class="pitem" id="pitem-load-save">Cargar partida</button>
@@ -360,7 +593,7 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
           </div>
         </div>
         <div class="dropdown">
-          <button class="icon-btn" id="btn-audio-toggle" aria-label="Menú de audio" aria-expanded="false">🔊</button>
+          <button class="icon-btn" id="btn-audio-toggle" aria-label="Menú de audio" aria-expanded="false"><span class="btn-icon" data-icon="speaker"></span></button>
           <div class="panel" id="panel-audio">
             <button class="pitem" id="pitem-mute">Silenciar</button>
             <div class="vol-row"><span class="vol-label">VOL</span><input id="vol-slider" type="range" min="0" max="1" step="0.05" value="0.5" /></div>
@@ -373,15 +606,23 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
     <section id="scene-banner">
       <div class="scene-row">
         <div class="scene-place" id="scene-place">Ardenhall</div>
-        <div class="scene-meta" id="scene-meta">mañana tenue · primavera · año 763 A.A.</div>
+        <div class="scene-info">
+          <div class="scene-meta" id="scene-time">mañana tenue · primavera · año 763 A.A.</div>
+          <div class="scene-health" id="scene-health">Se siente bien, sin heridas.</div>
+        </div>
       </div>
     </section>
+    <div class="scene-divider ornamental-divider"></div>
 
     <main id="chat"></main>
     <div id="quick-actions"></div>
     <div id="input-wrap">
       <textarea id="input" rows="2" placeholder="¿Qué hace?"></textarea>
-      <button id="send-btn" disabled>↵</button>
+      <button id="send-btn" disabled><span class="btn-icon" id="send-icon"></span></button>
+    </div>
+    <div class="game-footer">
+      <div class="ornamental-divider"></div>
+      <div class="splash-emblem" id="game-emblem" aria-hidden="true"></div>
     </div>
   </section>
 
@@ -456,7 +697,7 @@ input[type=range]{flex:1;accent-color:var(--gold);min-height:48px}
 // - Mayor: paso grande de actualización (cambio de alcance, sistemas nuevos importantes)
 // - Actualización: actualización chica (una funcionalidad nueva acotada)
 // - Parche: corrección de error o mejora leve de un sistema de poca relevancia
-const APP_VERSION = "0.1.2";
+const APP_VERSION = "0.4.0";
 
 const STORAGE_KEYS = {
   apiKey: 'avaloriaGroqApiKey',
@@ -551,6 +792,74 @@ const LOCATIONS = {
     quick:['Leer extensamente','Preguntar por una anomalía','Dormir en una pensión sobria','Viajar a Lareth']
   }
 };
+
+// ============================================================
+// Ronda 4A — Sistema visual: emblema e íconos SVG reutilizables.
+// Todavía no se insertan en ninguna pantalla (eso es trabajo de las
+// Rondas 4B/4C). Van a reemplazar a los emoji actuales del header
+// (🏠 💾 🔊) y a los textos de los botones "Comenzar"/"Configuración".
+// ============================================================
+
+// Escudo de Avaloria: heráldica simple, "A" estilizada. Pensado para el
+// footer de las pantallas. Dos tonos: borde en --frame-border, "A" en
+// --frame-highlight (mismos valores que el marco ornamental).
+const AVALORIA_EMBLEM = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.5L19.5 5.5L19.5 11C19.5 16.3 16.2 19.8 12 21.5C7.8 19.8 4.5 16.3 4.5 11L4.5 5.5Z" stroke="#4C3A20" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 7L8 18M12 7L16 18M9.6 13.5H14.4" stroke="#C79643" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+// Set de íconos de línea monocromáticos (trazo fino, sin relleno), tono
+// bronce/dorado (#C79643), viewBox 24x24 consistente entre todos.
+// Reemplazan: castle -> 🏠, floppy -> 💾, speaker -> 🔊.
+// Nuevos para el splash: sword -> "Comenzar", gear -> "Configuración".
+const ICONS = {
+  castle: `<svg viewBox="0 0 24 24" fill="none" stroke="#C79643" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M3 21V11H5V8H7V11H9V8H11V11H13V8H15V11H17V8H19V11H21V21H3Z"/><path d="M9 21V15H15V21"/></svg>`,
+  floppy: `<svg viewBox="0 0 24 24" fill="none" stroke="#C79643" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M5 4H16L19 7V20H5Z"/><rect x="8" y="4" width="7" height="5"/><rect x="7" y="13" width="10" height="7"/></svg>`,
+  speaker: `<svg viewBox="0 0 24 24" fill="none" stroke="#C79643" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M4 9V15H8L13 20V4L8 9Z"/><path d="M17 8A6 6 0 0 1 17 16"/><path d="M19.5 5.5A10 10 0 0 1 19.5 18.5"/></svg>`,
+  sword: `<svg viewBox="0 0 24 24" fill="none" stroke="#C79643" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="20" y1="4" x2="9" y2="15"/><line x1="7" y1="12" x2="12" y2="17"/><line x1="9" y1="15" x2="6" y2="18"/><circle cx="5" cy="19" r="1" fill="#C79643"/></svg>`,
+  gear: `<svg viewBox="0 0 24 24" fill="none" stroke="#C79643" stroke-width="1.5" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M18.06 10.71 21.14 10.94 21.14 13.06 18.06 13.29 17.2 15.38 19.21 17.71 17.71 19.21 15.38 17.2 13.29 18.06 13.06 21.14 10.94 21.14 10.71 18.06 8.62 17.2 6.29 19.21 4.79 17.71 6.8 15.38 5.94 13.29 2.86 13.06 2.86 10.94 5.94 10.71 6.8 8.62 4.79 6.29 6.29 4.79 8.62 6.8 10.71 5.94 10.94 2.86 13.06 2.86 13.29 5.94 15.38 6.8 17.71 4.79 19.21 6.29 17.2 8.62Z"/><circle cx="12" cy="12" r="2.6"/></svg>`
+};
+
+// ============================================================
+// Ronda 4B — Corona chica del splash. No forma parte del set
+// reutilizable de la 4A (ver nota de esa sección); es específica
+// de esta pantalla, mismo tono bronce/dorado que el resto.
+// ============================================================
+const SPLASH_CROWN = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 18L2.5 8L7.5 11.5L12 5L16.5 11.5L21.5 8L20.5 18H3.5Z" stroke="#C79643" stroke-width="1.3" stroke-linejoin="round"/><path d="M4.2 20H19.8" stroke="#C79643" stroke-width="1.3" stroke-linecap="round"/><circle cx="12" cy="5" r="1.1" fill="#C79643"/><circle cx="2.5" cy="8" r="1.1" fill="#C79643"/><circle cx="21.5" cy="8" r="1.1" fill="#C79643"/></svg>`;
+
+// Ronda 4B — Inserta las piezas del sistema visual 4A (íconos de
+// botón, corona y emblema) en el splash. Puramente de renderizado:
+// no toca estado del juego, Groq, calendario ni economía.
+function renderSplashVisuals(){
+  const crownEl = qs('splash-crown');
+  if(crownEl) crownEl.innerHTML = SPLASH_CROWN;
+  const emblemEl = qs('splash-emblem');
+  if(emblemEl) emblemEl.innerHTML = AVALORIA_EMBLEM;
+  document.querySelectorAll('#splash .btn-icon[data-icon]').forEach(el=>{
+    const icon = ICONS[el.dataset.icon];
+    if(icon) el.innerHTML = icon;
+  });
+}
+
+// ============================================================
+// Ronda 4C — Flecha del botón de enviar. Mismo lenguaje visual que
+// el resto de los íconos monocromáticos (stroke bronce, 1.5px).
+// ============================================================
+const SEND_ARROW = `<svg viewBox="0 0 24 24" fill="none" stroke="#C79643" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="4" y1="12" x2="18" y2="12"/><polyline points="12 6 18 12 12 18"/></svg>`;
+
+// Ronda 4C — Inserta las piezas del sistema visual 4A (emblema del
+// header, íconos castillo/disquete/parlante, flecha de enviar y
+// emblema del footer) en la pantalla de juego. Puramente de
+// renderizado: no toca estado del juego, Groq, calendario ni economía.
+function renderGameVisuals(){
+  const headerEmblemEl = qs('header-emblem');
+  if(headerEmblemEl) headerEmblemEl.innerHTML = AVALORIA_EMBLEM;
+  const gameEmblemEl = qs('game-emblem');
+  if(gameEmblemEl) gameEmblemEl.innerHTML = AVALORIA_EMBLEM;
+  const sendIconEl = qs('send-icon');
+  if(sendIconEl) sendIconEl.innerHTML = SEND_ARROW;
+  document.querySelectorAll('#header .btn-icon[data-icon]').forEach(el=>{
+    const icon = ICONS[el.dataset.icon];
+    if(icon) el.innerHTML = icon;
+  });
+}
 
 const ABSOLUTE_LORE = {
   "version": "1.0",
@@ -990,16 +1299,43 @@ function ensureRelations(){
 function addSystemChip(text){
   const chip=document.createElement('div'); chip.className='system-chip'; chip.textContent=text; qs('chat').appendChild(chip); scrollChat();
 }
-function addMessage(kind, text, meta=''){
+function addMessage(kind, text, meta='', animate=true){
   const wrap=document.createElement('article'); wrap.className=`msg msg-${kind}`;
-  const m=document.createElement('div'); m.className='meta'; m.textContent=meta || (kind==='player' ? 'Jugador' : 'narrador');
+  const m=document.createElement('div'); m.className='meta';
+  if(kind==='player'){
+    m.textContent = meta || 'Jugador';
+  }else{
+    m.innerHTML = `<span class="meta-line"></span><span class="meta-text">${escapeHtml(meta || 'narrador')}</span><span class="meta-line"></span>`;
+  }
   wrap.appendChild(m);
   const body=document.createElement('div'); body.className = kind==='player' ? 'player-text' : 'story';
-  if(kind==='player') body.textContent=text;
-  else body.innerHTML = text.split(/\n{2,}/).map(p=>`<p>${escapeHtml(p).replace(/\n/g,'<br>')}</p>`).join('');
   wrap.appendChild(body);
   qs('chat').appendChild(wrap);
-  scrollChat();
+  if(kind==='player'){
+    body.textContent=text;
+    scrollChat();
+  }else if(animate){
+    typesetStory(body, text);
+  }else{
+    body.innerHTML = text.split(/\n{2,}/).map(p=>`<p>${escapeHtml(p).replace(/\n/g,'<br>')}</p>`).join('');
+    scrollChat();
+  }
+}
+// Ronda 4C — Efecto de aparición progresiva del texto del narrador:
+// cada párrafo se agrega con una pausa breve y un fade suave,
+// reutilizando la animación fadeIn ya existente para .msg en vez de
+// escribir un sistema de tipeo letra por letra desde cero.
+function typesetStory(body, text){
+  const paragraphs = text.split(/\n{2,}/).map(p => escapeHtml(p).replace(/\n/g,'<br>'));
+  paragraphs.forEach((html, i)=>{
+    setTimeout(()=>{
+      const p=document.createElement('p');
+      p.className='story-p-in';
+      p.innerHTML = html;
+      body.appendChild(p);
+      scrollChat();
+    }, i*260);
+  });
 }
 function addTyping(){
   removeTyping();
@@ -1563,7 +1899,8 @@ function updateSceneUI(){
   if(!personajeState) return;
   const loc = currentLocation();
   qs('scene-place').textContent = loc.name;
-  qs('scene-meta').textContent = `${currentTimeString()} · ${healthNarrative(personajeState.personaje.salud)}`;
+  qs('scene-time').textContent = currentTimeString();
+  qs('scene-health').textContent = healthNarrative(personajeState.personaje.salud);
   qs('scene-label-panel').textContent = `${loc.name} · ${personajeState.escenaActual}`;
   qs('header-title').textContent = personajeState.personaje.nombre || 'Crónicas de Avaloria';
   document.body.style.background = sceneBackground(personajeState.escenaActual);
@@ -1608,7 +1945,7 @@ function rebuildChat(){
     personajeState.chatLog.push({ role:'assistant', content:intro });
     persistCharacter();
   }else{
-    personajeState.chatLog.forEach(entry => addMessage(entry.role==='user' ? 'player' : 'narrator', entry.content, entry.role==='user' ? 'Jugador':'narrador'));
+    personajeState.chatLog.forEach(entry => addMessage(entry.role==='user' ? 'player' : 'narrator', entry.content, entry.role==='user' ? 'Jugador':'narrador', false));
   }
 }
 function introNarration(){
@@ -1716,6 +2053,8 @@ async function handleSend(){
 }
 
 function boot(){
+  renderSplashVisuals();
+  renderGameVisuals();
   updateSaveMenu();
   renderTraits();
   renderNarratorNotes();
